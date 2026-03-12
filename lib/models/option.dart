@@ -4,6 +4,8 @@ class OptionGroup {
   final bool required;
   final bool multiSelect;
   final List<Option> options;
+  final int row;
+  final int column;
 
   OptionGroup({
     required this.id,
@@ -11,6 +13,8 @@ class OptionGroup {
     required this.required,
     required this.multiSelect,
     required this.options,
+    required this.row,
+    required this.column,
   });
 }
 

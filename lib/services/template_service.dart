@@ -1,14 +1,15 @@
+import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/option.dart';
 import '../models/template.dart';
 
-Future<List<OptionGroup>> _loadOptionGroups(String templateId) async {
+Future<List<OptionGroup>> _loadOptionGroups(Template template, String sectionId) async {
   final supabase = Supabase.instance.client;
 
   final groupResponse = await supabase
       .from('option_groups')
       .select()
-      .eq('template_id', templateId)
+      .eq('section_id', sectionId)
       .order('display_order');
 
   List<OptionGroup> groups = [];
@@ -23,10 +24,13 @@ Future<List<OptionGroup>> _loadOptionGroups(String templateId) async {
         required: group['required'] ?? false,
         multiSelect: group['multi_select'] ?? false,
         options: options,
+        row: group['grid_row'],
+        column: group['grid_column'],
       ),
     );
   }
 
+  template.optionGroups.addAll(groups);
   return groups;
 }
 
@@ -73,44 +77,49 @@ class TemplateService {
 
     for (final templateRow in templateRows) {
       final templateId = templateRow['id'];
-
-      final sections = await _fetchSections(templateId);
-      final optionGroups = await _loadOptionGroups(templateRow['id']);
-
-      templates.add(
-        Template(
+      final Template template = Template(
           id: templateId,
           name: templateRow['name'],
           system: templateRow['system'],
-          sections: sections,
-          optionGroups: optionGroups,
-        ),
+          sections: [],
+          optionGroups: {},
+          fields: {}
       );
+
+      final sections = await _fetchSections(template);
+      template.sections = sections;
+      templates.add(template);
     }
 
     return templates;
   }
 
-  Future<List<TemplateSection>> _fetchSections(String templateId) async {
+  Future<List<TemplateSection>> _fetchSections(Template template) async {
     final sectionRows = await supabase
         .from('template_sections')
         .select()
-        .eq('template_id', templateId)
-        .order('display_order');
+        .eq('template_id', template.id)
+        .order('display_order', ascending: true);
 
     List<TemplateSection> sections = [];
 
     for (final sectionRow in sectionRows) {
       final sectionId = sectionRow['id'];
 
-      final fields = await _fetchFields(sectionId);
+      final fields = await _fetchFields(template, sectionId);
+      final optionGroups = await _loadOptionGroups(template, sectionId);
+
+      List<SheetElement> elements = [];
+
+      elements.addAll(fields.map((field) {return FieldElement(elem: field);}));
+      elements.addAll(optionGroups.map((og) {return OptionGroupElement(elem: og);}));
 
       sections.add(
         TemplateSection(
           id: sectionId,
           name: sectionRow['name'],
           order: sectionRow['display_order'],
-          fields: fields,
+          elements: elements,
         ),
       );
     }
@@ -118,14 +127,14 @@ class TemplateService {
     return sections;
   }
 
-  Future<List<TemplateField>> _fetchFields(String sectionId) async {
+  Future<List<TemplateField>> _fetchFields(Template template, String sectionId) async {
     final fieldRows = await supabase
         .from('template_fields')
         .select()
         .eq('section_id', sectionId)
         .order('display_order');
 
-    return fieldRows.map<TemplateField>((row) {
+    List<TemplateField> result = fieldRows.map<TemplateField>((row) {
       return TemplateField(
         id: row['id'],
         label: row['label'],
@@ -138,5 +147,8 @@ class TemplateService {
         readonly: row['readonly'] ?? false,
       );
     }).toList();
+
+    template.fields.addAll(result);
+    return result;
   }
 }

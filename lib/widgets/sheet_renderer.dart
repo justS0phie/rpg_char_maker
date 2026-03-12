@@ -1,3 +1,4 @@
+import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'package:flutter/material.dart';
 
 import '../models/template.dart';
@@ -25,7 +26,8 @@ class SheetRenderer extends StatelessWidget {
     final map = <String, TemplateField>{};
 
     for (var section in template.sections) {
-      for (var field in section.fields) {
+      for (var elem in section.elements.where((elem) {return elem.type == "field";})) {
+        final field = (elem as FieldElement).elem;
 
         if (field.alias != null) {
           map[field.alias!] = field;

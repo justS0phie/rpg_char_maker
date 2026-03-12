@@ -1,12 +1,13 @@
+import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'package:flutter/material.dart';
 
 import '../models/template.dart';
 import '../models/character.dart';
 import '../services/field_controller_store.dart';
 import 'field_renderer.dart';
+import 'option_group_widget.dart';
 
 class SectionRenderer extends StatelessWidget {
-
   final TemplateSection section;
   final Character character;
   final FieldControllerStore controllerStore;
@@ -26,47 +27,57 @@ class SectionRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     int maxRow = 0;
     int maxCol = 0;
 
-    for (var field in section.fields) {
-      if (field.row > maxRow) maxRow = field.row;
-      if (field.column > maxCol) maxCol = field.column;
+    for (var element in section.elements) {
+      if (element.row > maxRow) maxRow = element.row;
+      if (element.column > maxCol) maxCol = element.column;
     }
 
     List<TableRow> rows = [];
 
     for (int r = 0; r <= maxRow; r++) {
-
       List<Widget> cells = [];
 
       for (int c = 0; c <= maxCol; c++) {
+        SheetElement? element;
 
-        TemplateField? field;
-
-        for (var f in section.fields) {
-          if (f.row == r && f.column == c) {
-            field = f;
+        for (var e in section.elements) {
+          if (e.row == r && e.column == c) {
+            element = e;
             break;
           }
         }
 
-        cells.add(
-          Padding(
-            padding: const EdgeInsets.all(8),
-            child: field != null
-                ? FieldRenderer(
+        Widget child = const SizedBox();
+
+        if (element != null) {
+          if (element.type == "field") {
+            final field = (element as FieldElement).elem;
+
+            child = FieldRenderer(
               field: field,
               character: character,
               controllerStore: controllerStore,
               aliasMap: aliasMap,
               onValueChanged: onValueChanged,
               template: template,
-            )
-                : const SizedBox(),
-          ),
-        );
+            );
+          }
+          /// OPTION GROUP
+          else if (element.type == "option_group") {
+            final group = (element as OptionGroupElement).elem;
+
+            child = OptionGroupWidget(
+              group: group,
+              character: character,
+              onChanged: onValueChanged,
+            );
+          }
+        }
+
+        cells.add(Padding(padding: const EdgeInsets.all(8), child: child));
       }
 
       rows.add(TableRow(children: cells));
@@ -75,15 +86,11 @@ class SectionRenderer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         const SizedBox(height: 20),
 
         Text(
           section.name,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
         const SizedBox(height: 10),

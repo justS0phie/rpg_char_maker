@@ -1,9 +1,9 @@
+import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'package:flutter/material.dart';
 
 import '../models/character.dart';
 import '../models/template.dart';
 import '../services/field_controller_store.dart';
-import '../widgets/option_group_widget.dart';
 import '../widgets/sheet_renderer.dart';
 
 class CharacterEditorScreen extends StatefulWidget {
@@ -43,8 +43,8 @@ class _CharacterEditorScreenState
 
     for (var section in widget.template.sections) {
 
-      for (var field in section.fields) {
-
+      for (var elem in section.elements.where((elem) {return elem.type == "field";})) {
+        final field = (elem as FieldElement).elem;
         if (!widget.character.values.containsKey(field.id)) {
 
           if (field.defaultValue != null) {
@@ -101,20 +101,6 @@ class _CharacterEditorScreenState
           ),
 
           const Divider(),
-
-          Column(
-            children: template.optionGroups.map((group) {
-
-              return OptionGroupWidget(
-                group: group,
-                character: character,
-                onChanged: refreshSheet,
-              );
-
-            }).toList(),
-          ),
-
-          template.optionGroups.isNotEmpty ? const Divider() : Container(),
 
           Expanded(
             child: SheetRenderer(

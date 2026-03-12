@@ -1,11 +1,13 @@
+import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'option.dart';
 
 class Template {
   final String id;
   final String name;
   final String system;
-  final List<TemplateSection> sections;
-  final List<OptionGroup> optionGroups;
+  List<TemplateSection> sections;
+  final Set<OptionGroup> optionGroups;
+  final Set<TemplateField> fields;
 
   Template({
     required this.id,
@@ -13,6 +15,7 @@ class Template {
     required this.system,
     required this.sections,
     required this.optionGroups,
+    required this.fields,
   });
 }
 
@@ -20,13 +23,13 @@ class TemplateSection {
   final String id;
   final String name;
   final int order;
-  final List<TemplateField> fields;
+  final List<SheetElement> elements;
 
   TemplateSection({
     required this.id,
     required this.name,
     required this.order,
-    required this.fields,
+    required this.elements,
   });
 }
 
