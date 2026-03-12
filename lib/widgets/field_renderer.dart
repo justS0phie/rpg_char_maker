@@ -61,7 +61,7 @@ class FieldRenderer extends StatelessWidget {
 
     // Compute modifier bonus for display
     final modifiers = ModifierEngine.computeModifiers(template, character);
-    final bonus = modifiers[field.id] ?? 0;
+    final bonus = modifiers[field.alias] ?? 0;
     final displayValue = (character.values[field.id] ?? 0) + bonus;
 
     // Update controller text to show base + bonus
@@ -94,11 +94,12 @@ class FieldRenderer extends StatelessWidget {
       field,
       character,
       aliasMap,
+      template
     );
 
     // Add option effects modifiers
     final modifiers = ModifierEngine.computeModifiers(template, character);
-    final bonus = modifiers[field.id] ?? 0;
+    final bonus = modifiers[field.alias] ?? 0;
     final displayValue = value + bonus;
 
     return Column(

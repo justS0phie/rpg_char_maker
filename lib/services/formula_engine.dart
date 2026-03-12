@@ -2,6 +2,7 @@ import 'package:math_expressions/math_expressions.dart';
 
 import '../models/template.dart';
 import '../models/character.dart';
+import 'modifier_engine.dart';
 
 class FormulaEngine {
 
@@ -9,6 +10,7 @@ class FormulaEngine {
       TemplateField field,
       Character character,
       Map<String, TemplateField> aliasMap,
+      Template template
       ) {
 
     if (field.formula == null) {
@@ -31,9 +33,18 @@ class FormulaEngine {
         final value =
             character.values[templateField.id] ?? 0;
 
+        // Add option effects modifiers
+        final modifiers = ModifierEngine.computeModifiers(template, character);
+        final bonus = modifiers[alias] ?? 0;
+        final modifiedValue = value + bonus;
+
+        print(alias);
+        print(modifiers);
+        print(modifiedValue);
+
         context.bindVariable(
           Variable(alias),
-          Number(value.toDouble()),
+          Number(modifiedValue.toDouble()),
         );
       });
 

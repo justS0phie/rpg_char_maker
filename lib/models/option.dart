@@ -16,20 +16,21 @@ class OptionGroup {
 
 class OptionEffect {
   final String optionId;
-  final String fieldId;
+  final String fieldAlias;
   final double modifier;
 
   OptionEffect({
     required this.optionId,
-    required this.fieldId,
+    required this.fieldAlias,
     required this.modifier,
   });
 
   factory OptionEffect.fromJson(Map<String,dynamic> json) {
+    print(json);
 
     return OptionEffect(
       optionId: json['option_id'],
-      fieldId: json['field_id'],
+      fieldAlias: json['field_alias'],
       modifier: (json['modifier'] as num).toDouble(),
     );
   }

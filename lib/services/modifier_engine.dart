@@ -21,7 +21,7 @@ class ModifierEngine {
         for (final effect in option.effects) {
 
           modifiers.update(
-            effect.fieldId,
+            effect.fieldAlias,
                 (value) => value + effect.modifier,
             ifAbsent: () => effect.modifier,
           );
