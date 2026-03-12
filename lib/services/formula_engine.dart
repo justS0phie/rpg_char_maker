@@ -19,7 +19,7 @@ class FormulaEngine {
 
     String expression = field.formula!;
 
-    final parser = Parser();
+    final parser = GrammarParser();
 
     try {
 
@@ -37,10 +37,6 @@ class FormulaEngine {
         final modifiers = ModifierEngine.computeModifiers(template, character);
         final bonus = modifiers[alias] ?? 0;
         final modifiedValue = value + bonus;
-
-        print(alias);
-        print(modifiers);
-        print(modifiedValue);
 
         context.bindVariable(
           Variable(alias),

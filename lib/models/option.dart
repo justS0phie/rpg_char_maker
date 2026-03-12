@@ -26,8 +26,6 @@ class OptionEffect {
   });
 
   factory OptionEffect.fromJson(Map<String,dynamic> json) {
-    print(json);
-
     return OptionEffect(
       optionId: json['option_id'],
       fieldAlias: json['field_alias'],
