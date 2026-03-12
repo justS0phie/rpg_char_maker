@@ -29,6 +29,14 @@ class ModifierEngine {
       }
     }
 
+    for (var item in character.equipment) {
+      if (!item.equipped) continue;
+      item.modifiers.forEach((fieldId, value) {
+        modifiers[fieldId] =
+            (modifiers[fieldId] ?? 0) + value;
+      });
+    }
+
     return modifiers;
   }
 }

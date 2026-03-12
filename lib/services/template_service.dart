@@ -119,6 +119,7 @@ class TemplateService {
           id: sectionId,
           name: sectionRow['name'],
           order: sectionRow['display_order'],
+          type: sectionRow['type'],
           elements: elements,
         ),
       );

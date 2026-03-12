@@ -1,3 +1,5 @@
+import 'equipment_item.dart';
+
 class CharacterSelection {
   final String groupId;
   final Set<String> optionIds;
@@ -15,6 +17,8 @@ class Character {
   Map<String,dynamic> values;
   Map<String, CharacterSelection> selections;
 
+  List<EquipmentItem> equipment;
+
   CharacterSelection selectionFor(String groupId) {
     return selections.putIfAbsent(
       groupId,
@@ -28,8 +32,10 @@ class Character {
     required this.templateId,
 
     Map<String,dynamic>? values,
-    Map<String, CharacterSelection>? selections
+    Map<String, CharacterSelection>? selections,
+    List<EquipmentItem>? equipment
 
   })  : values = values ?? {},
-        selections = selections ?? {};
+        selections = selections ?? {},
+        equipment = equipment ?? [];
 }

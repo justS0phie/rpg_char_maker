@@ -6,6 +6,7 @@ import '../models/character.dart';
 import '../services/field_controller_store.dart';
 import 'field_renderer.dart';
 import 'option_group_widget.dart';
+import 'equipment_section.dart';
 
 class SectionRenderer extends StatelessWidget {
   final TemplateSection section;
@@ -27,6 +28,15 @@ class SectionRenderer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    if (section.type == "equip") {
+      return EquipmentSection(
+        character: character,
+        onChanged: onValueChanged,
+        template: template,
+      );
+    }
+
     int maxRow = 0;
     int maxCol = 0;
 
@@ -65,7 +75,6 @@ class SectionRenderer extends StatelessWidget {
               template: template,
             );
           }
-          /// OPTION GROUP
           else if (element.type == "option_group") {
             final group = (element as OptionGroupElement).elem;
 

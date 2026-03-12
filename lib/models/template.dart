@@ -23,12 +23,14 @@ class TemplateSection {
   final String id;
   final String name;
   final int order;
+  final String type;
   final List<SheetElement> elements;
 
   TemplateSection({
     required this.id,
     required this.name,
     required this.order,
+    required this.type,
     required this.elements,
   });
 }
@@ -44,7 +46,7 @@ class TemplateField {
 
   final String? defaultValue;
 
-  final String? alias;
+  final String alias;
   final String? formula;
   final bool readonly;
 
@@ -54,8 +56,8 @@ class TemplateField {
     required this.type,
     required this.row,
     required this.column,
+    required this.alias,
     this.defaultValue,
-    this.alias,
     this.formula,
     this.readonly = false,
   });
