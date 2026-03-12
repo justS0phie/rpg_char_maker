@@ -43,12 +43,16 @@ class OptionAbility {
   final String name;
   final String optionId;
   final String description;
+  final int levelRequired;
+  final Map<String, dynamic> modifiers;
 
   OptionAbility({
     required this.id,
     required this.optionId,
     required this.name,
     required this.description,
+    required this.levelRequired,
+    required this.modifiers,
   });
 
   factory OptionAbility.fromJson(Map<String, dynamic> json) {
@@ -56,7 +60,9 @@ class OptionAbility {
       id: json['id'],
       optionId: json['option_id'],
       name: json['name'],
-      description: json['description'],
+      description: json['description'] ?? '',
+      levelRequired: json['level_required'],
+      modifiers: json['modifiers'],
     );
   }
 }

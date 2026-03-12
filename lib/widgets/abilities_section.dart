@@ -17,6 +17,8 @@ class AbilitiesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<OptionAbility> abilities = [];
+    final LvlField = template.fields.where((f) {return f.alias == "LVL";}).firstOrNull;
+    final level = LvlField != null ? character.values[LvlField.id] ?? 0 : 0;
 
     for (OptionGroup group in template.optionGroups) {
       CharacterSelection? groupSelections = character.selections.values.where((s) {return s.groupId == group.id;}).firstOrNull;
@@ -24,7 +26,7 @@ class AbilitiesSection extends StatelessWidget {
 
       for (Option option in group.options) {
         if (groupSelections.optionIds.contains(option.id)){
-          abilities.addAll(option.abilities);
+          abilities.addAll(option.abilities.where((ability) {return level >= ability.levelRequired;}));
         }
       }
     }
