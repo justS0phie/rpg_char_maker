@@ -46,7 +46,7 @@ class TemplateField {
 
   final String? defaultValue;
 
-  final String alias;
+  final String? alias;
   final String? formula;
   final bool readonly;
 
