@@ -70,6 +70,8 @@ class EquipmentSection extends StatelessWidget {
           },
           child: const Text("Add Item"),
         ),
+
+        const SizedBox(height: 20),
       ],
     );
   }

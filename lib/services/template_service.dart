@@ -56,8 +56,18 @@ Future<List<Option>> _loadOptions(String groupId) async {
         OptionEffect.fromJson(e))
         .toList();
 
+    final abilitiesResponse = await supabase
+        .from('option_abilities')
+        .select()
+        .eq('option_id', option['id']);
+
+    final abilities = abilitiesResponse
+        .map<OptionAbility>((e) =>
+        OptionAbility.fromJson(e))
+        .toList();
+
     options.add(
-      Option.fromJson(option, effects),
+      Option.fromJson(option, effects, abilities),
     );
   }
 

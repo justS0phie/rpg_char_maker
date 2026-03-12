@@ -29,11 +29,34 @@ class OptionEffect {
     required this.modifier,
   });
 
-  factory OptionEffect.fromJson(Map<String,dynamic> json) {
+  factory OptionEffect.fromJson(Map<String, dynamic> json) {
     return OptionEffect(
       optionId: json['option_id'],
       fieldAlias: json['field_alias'],
       modifier: (json['modifier'] as num).toDouble(),
+    );
+  }
+}
+
+class OptionAbility {
+  final String id;
+  final String name;
+  final String optionId;
+  final String description;
+
+  OptionAbility({
+    required this.id,
+    required this.optionId,
+    required this.name,
+    required this.description,
+  });
+
+  factory OptionAbility.fromJson(Map<String, dynamic> json) {
+    return OptionAbility(
+      id: json['id'],
+      optionId: json['option_id'],
+      name: json['name'],
+      description: json['description'],
     );
   }
 }
@@ -44,24 +67,27 @@ class Option {
   final String description;
 
   final List<OptionEffect> effects;
+  final List<OptionAbility> abilities;
 
   Option({
     required this.id,
     required this.name,
     required this.description,
     required this.effects,
+    required this.abilities,
   });
 
   factory Option.fromJson(
-      Map<String,dynamic> json,
-      List<OptionEffect> effects,
-      ) {
-
+    Map<String, dynamic> json,
+    List<OptionEffect> effects,
+    List<OptionAbility> abilities,
+  ) {
     return Option(
       id: json['id'],
       name: json['name'],
       description: json['description'] ?? "",
       effects: effects,
+      abilities: abilities,
     );
   }
 }

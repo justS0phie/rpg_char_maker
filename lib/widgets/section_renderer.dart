@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/template.dart';
 import '../models/character.dart';
 import '../services/field_controller_store.dart';
+import 'abilities_section.dart';
 import 'field_renderer.dart';
 import 'option_group_widget.dart';
 import 'equipment_section.dart';
@@ -34,6 +35,12 @@ class SectionRenderer extends StatelessWidget {
         character: character,
         onChanged: onValueChanged,
         template: template,
+      );
+    } else if (section.type == "abilities") {
+
+      return AbilitiesSection(
+        template: template,
+        character: character,
       );
     }
 
