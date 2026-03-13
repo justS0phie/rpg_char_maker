@@ -41,6 +41,7 @@ class SectionRenderer extends StatelessWidget {
       return AbilitiesSection(
         template: template,
         character: character,
+        onChanged: onValueChanged,
       );
     }
 

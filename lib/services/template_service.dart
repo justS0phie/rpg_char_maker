@@ -3,14 +3,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/option.dart';
 import '../models/template.dart';
 
-Future<List<OptionGroup>> _loadOptionGroups(Template template, String sectionId) async {
+Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId) async {
   final supabase = Supabase.instance.client;
+  PostgrestList groupResponse;
 
-  final groupResponse = await supabase
-      .from('option_groups')
-      .select()
-      .eq('section_id', sectionId)
-      .order('display_order');
+  if (sectionId != null) {
+    groupResponse = await supabase
+        .from('option_groups')
+        .select()
+        .eq('section_id', sectionId)
+        .order('display_order');
+  } else {
+    groupResponse = await supabase
+        .from('option_groups')
+        .select()
+        .isFilter('section_id', null)
+        .order('display_order');
+  }
 
   List<OptionGroup> groups = [];
 
@@ -24,8 +33,8 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String sectionId)
         required: group['required'] ?? false,
         multiSelect: group['multi_select'] ?? false,
         options: options,
-        row: group['grid_row'],
-        column: group['grid_column'],
+        row: group['grid_row'] ?? 0,
+        column: group['grid_column'] ?? 0,
       ),
     );
   }
@@ -98,6 +107,7 @@ class TemplateService {
 
       final sections = await _fetchSections(template);
       template.sections = sections;
+      await _loadOptionGroups(template, null);
       templates.add(template);
     }
 

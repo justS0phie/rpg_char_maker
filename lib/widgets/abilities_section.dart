@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 import '../models/option.dart';
 import '../models/template.dart';
 import '../models/character.dart';
+import 'option_group_widget.dart';
 
 class AbilitiesSection extends StatelessWidget {
   final Template template;
   final Character character;
+  final VoidCallback onChanged;
 
   const AbilitiesSection({
     super.key,
     required this.template,
     required this.character,
+    required this.onChanged,
   });
 
   @override
@@ -53,8 +56,15 @@ class AbilitiesSection extends StatelessWidget {
                 ),
 
                 Text(ability.description),
+
+                if (ability.optionGroupId != null)
+                  OptionGroupWidget(
+                    group: template.optionGroups.firstWhere((og) {return og.id == ability.optionGroupId;}),
+                    character: character,
+                    onChanged: onChanged,
+                  )
               ],
-            ),
+            )
           );
         }),
 
