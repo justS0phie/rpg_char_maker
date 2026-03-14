@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../models/template.dart';
 import '../models/character.dart';
 import '../models/spell.dart';
+import '../services/formula_engine.dart';
 
 class SpellSection extends StatefulWidget {
   final Template template;
@@ -33,13 +34,28 @@ class _SpellSectionState extends State<SpellSection> {
         .expand((s) => s.optionIds)
         .toSet();
 
-    return widget.template.spells.where((spell) {
+    num maxSlot = widget.template.slots.map((slot) {
+      return FormulaEngine.evaluate(slot.maxFormula, widget.character, widget.aliasMap, widget.template) > 0 ? slot.level : 0;
+    }).where((s) => s > 0).lastOrNull ?? 0;
+
+    List<Spell> filtered = widget.template.spells.where((spell) {
+      if (spell.level > maxSlot) {
+        return false;
+      }
       if (spell.requiredOptions.isEmpty) {
         return true;
       }
 
       return spell.requiredOptions.any((opt) => selectedOptions.contains(opt));
     }).toList();
+    filtered.sort((a, b) {
+      int lvlCmp = a.level.compareTo(b.level);
+      if (lvlCmp != 0) {
+        return lvlCmp;
+      }
+      return a.name.compareTo(b.name);
+    });
+    return filtered;
   }
 
   Spell _getSpellById(String id) {
@@ -63,19 +79,25 @@ class _SpellSectionState extends State<SpellSection> {
   @override
   Widget build(BuildContext context) {
     final availableSpells = _getAvailableSpells();
+    final List<Spell> sortedSpells =
+      widget.character.spells
+          .map((cs) => _getSpellById(cs))
+          .toList()
+        ..sort((a, b) {
+
+          final levelCompare = a.level.compareTo(b.level);
+
+          if (levelCompare != 0) {
+            return levelCompare;
+          }
+
+          return a.name.compareTo(b.name);
+
+        });
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 20),
-
-        const Text(
-          "Spells",
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-
-        const SizedBox(height: 10),
-
         SpellSlotsWidget(
           character: widget.character,
           template: widget.template,
@@ -84,6 +106,11 @@ class _SpellSectionState extends State<SpellSection> {
         ),
 
         const SizedBox(height: 20),
+
+        const Text(
+          "Spells",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
 
         Row(
           children: [
@@ -117,11 +144,9 @@ class _SpellSectionState extends State<SpellSection> {
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: widget.character.spells.length,
+          itemCount: sortedSpells.length,
           itemBuilder: (context, index) {
-            final charSpell = widget.character.spells[index];
-
-            final spell = _getSpellById(charSpell);
+            final spell = sortedSpells[index];
 
             return Card(
               child: ListTile(

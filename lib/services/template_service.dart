@@ -140,6 +140,7 @@ class TemplateService {
             id: row['id'],
             name: row['name'],
             description: row['description'],
+            level: row['level'],
             requiredOptions: spellRequirements.map((r) => r['option_id'] as String).toList()
         ),
       );
@@ -153,7 +154,7 @@ class TemplateService {
         .from('template_spell_slots')
         .select()
         .eq('template_id', template.id)
-        .order('level');
+        .order('level', ascending: true);
 
     return slots.map((s) {
       return TemplateSpellSlot(

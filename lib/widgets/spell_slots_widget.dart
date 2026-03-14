@@ -26,7 +26,7 @@ class SpellSlotsWidget extends StatelessWidget {
       children: [
         const Text(
           "Spell Slots",
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
         const SizedBox(height: 10),

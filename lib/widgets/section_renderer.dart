@@ -117,8 +117,6 @@ class SectionRenderer extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(height: 20),
-
         Text(
           section.name,
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

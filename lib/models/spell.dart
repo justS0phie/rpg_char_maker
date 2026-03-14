@@ -3,7 +3,7 @@ class Spell {
   String id;
   String name;
 
-  String level;
+  int level;
   bool prepared;
 
   String description;
@@ -12,7 +12,7 @@ class Spell {
   Spell({
     required this.id,
     required this.name,
-    this.level = "0",
+    this.level = 0,
     this.prepared = false,
     this.description = "",
     required this.requiredOptions,
