@@ -26,7 +26,6 @@ class InventorySection extends StatelessWidget {
         const SizedBox(height: 10),
 
         ...character.inventory.map((item) {
-          final nameController = TextEditingController(text: item.name);
           final amountController = TextEditingController(text: item.amount);
 
           return Row(
