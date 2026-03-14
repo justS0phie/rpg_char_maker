@@ -70,12 +70,6 @@ class _SpellSectionState extends State<SpellSection> {
     setState(() {});
   }
 
-  void _removeSpell(int index) {
-    widget.character.spells.removeAt(index);
-    widget.onChanged();
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     final availableSpells = _getAvailableSpells();
@@ -163,7 +157,11 @@ class _SpellSectionState extends State<SpellSection> {
 
                 trailing: IconButton(
                   icon: const Icon(Icons.delete),
-                  onPressed: () => _removeSpell(index),
+                  onPressed: () {
+                    widget.character.spells.removeWhere((s) => s == spell.id);
+                    widget.onChanged();
+                    setState(() {});
+                  },
                 ),
               ),
             );
