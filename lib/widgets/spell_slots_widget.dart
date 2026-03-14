@@ -45,7 +45,7 @@ class SpellSlotsWidget extends StatelessWidget {
 
           return Row(
             children: [
-              Text("Lv ${slot.level} "),
+              Text(slot.srcLabel.replaceAll("{level}", slot.level.toString())),
               ...List.generate(maxSlots as int, (i) {
                 bool used = i < usage.used;
 
@@ -69,8 +69,6 @@ class SpellSlotsWidget extends StatelessWidget {
                   },
                 );
               }),
-
-              Text("${usage.used}/$maxSlots"),
             ],
           );
         }),
