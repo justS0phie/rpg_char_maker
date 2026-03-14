@@ -1,11 +1,13 @@
 import '../models/template.dart';
 import '../models/character.dart';
+import 'formula_engine.dart';
 
 class ModifierEngine {
 
   static Map<String,double> computeModifiers(
       Template template,
       Character character,
+      Map<String, TemplateField> aliasMap,
       ) {
     Map<String,double> modifiers = {};
 
@@ -20,10 +22,17 @@ class ModifierEngine {
             .firstWhere((o) => o.id == optionId);
         for (final effect in option.effects) {
 
+          final modifier = FormulaEngine.evaluate(
+            effect.formula,
+            character,
+            aliasMap,
+            template,
+          );
+
           modifiers.update(
             effect.fieldAlias,
-                (value) => value + effect.modifier,
-            ifAbsent: () => effect.modifier,
+                (value) => value + modifier,
+            ifAbsent: () => modifier,
           );
         }
       }

@@ -9,17 +9,15 @@ import 'modifier_engine.dart';
 class FormulaEngine {
 
   static double evaluate(
-      TemplateField field,
+      String? expression,
       Character character,
       Map<String, TemplateField> aliasMap,
       Template template
       ) {
 
-    if (field.formula == null) {
+    if (expression == null) {
       return 0;
     }
-
-    String expression = field.formula!;
 
     final parser = GrammarParser();
 
@@ -36,7 +34,7 @@ class FormulaEngine {
             character.values[templateField.id] ?? 0;
 
         // Add option effects modifiers
-        final modifiers = ModifierEngine.computeModifiers(template, character);
+        final modifiers = ModifierEngine.computeModifiers(template, character, aliasMap);
         final bonus = modifiers[alias] ?? 0;
         final modifiedValue = value + bonus;
 

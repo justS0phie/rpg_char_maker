@@ -60,7 +60,7 @@ class FieldRenderer extends StatelessWidget {
     );
 
     // Compute modifier bonus for display
-    final modifiers = ModifierEngine.computeModifiers(template, character);
+    final modifiers = ModifierEngine.computeModifiers(template, character, aliasMap);
     final bonus = modifiers[field.alias] ?? 0;
     final displayValue = (character.values[field.id] ?? 0) + bonus;
 
@@ -91,14 +91,14 @@ class FieldRenderer extends StatelessWidget {
 
     // Formula already calculates a value
     double value = FormulaEngine.evaluate(
-      field,
+      field.formula,
       character,
       aliasMap,
       template
     );
 
     // Add option effects modifiers
-    final modifiers = ModifierEngine.computeModifiers(template, character);
+    final modifiers = ModifierEngine.computeModifiers(template, character, aliasMap);
     final bonus = modifiers[field.alias] ?? 0;
     final displayValue = value + bonus;
 

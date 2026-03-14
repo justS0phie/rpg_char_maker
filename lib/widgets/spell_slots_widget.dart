@@ -32,20 +32,7 @@ class SpellSlotsWidget extends StatelessWidget {
         const SizedBox(height: 10),
 
         ...template.slots.map((slot) {
-          double maxSlots = FormulaEngine.evaluate(
-            TemplateField(
-              id: "",
-              label: "",
-              type: "formula",
-              row: 0,
-              column: 0,
-              alias: "",
-              formula: slot.maxFormula,
-            ),
-            character,
-            aliasMap,
-            template,
-          );
+          double maxSlots = FormulaEngine.evaluate(slot.maxFormula, character, aliasMap, template);
 
           var usage = character.spellSlotUsage.firstWhere(
             (u) => u.level == slot.level,

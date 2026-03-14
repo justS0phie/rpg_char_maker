@@ -21,19 +21,19 @@ class OptionGroup {
 class OptionEffect {
   final String optionId;
   final String fieldAlias;
-  final double modifier;
+  final String formula;
 
   OptionEffect({
     required this.optionId,
     required this.fieldAlias,
-    required this.modifier,
+    required this.formula,
   });
 
   factory OptionEffect.fromJson(Map<String, dynamic> json) {
     return OptionEffect(
       optionId: json['option_id'],
       fieldAlias: json['field_alias'],
-      modifier: (json['modifier'] as num).toDouble(),
+      formula: json['formula'],
     );
   }
 }
