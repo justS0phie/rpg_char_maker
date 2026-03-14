@@ -160,6 +160,7 @@ class TemplateService {
       return TemplateSpellSlot(
         level: s['level'],
         maxFormula: s['max_formula'],
+        requiredFormula: s['required_formula'],
         srcLabel: s['src_label'],
       );
     }).toList();

@@ -29,14 +29,28 @@ class SpellSection extends StatefulWidget {
 class _SpellSectionState extends State<SpellSection> {
   String? selectedSpellId;
 
+  List<TemplateSpellSlot> _getAvailableSlots() {
+    return widget.template.slots.where((slot) {
+      print("---------------");
+      print(slot.srcLabel);
+      print(slot.maxFormula);
+      print(slot.requiredFormula);
+      if (slot.requiredFormula != null) {
+        if (FormulaEngine.evaluate(slot.requiredFormula, widget.character, widget.aliasMap, widget.template) == 0) {
+          return false;
+        }
+      }
+      return FormulaEngine.evaluate(slot.maxFormula, widget.character, widget.aliasMap, widget.template) > 0;
+    }).toList();
+  }
+
   List<Spell> _getAvailableSpells() {
     final selectedOptions = widget.character.selections.values
         .expand((s) => s.optionIds)
         .toSet();
 
-    num maxSlot = widget.template.slots.map((slot) {
-      return FormulaEngine.evaluate(slot.maxFormula, widget.character, widget.aliasMap, widget.template) > 0 ? slot.level : 0;
-    }).where((s) => s > 0).lastOrNull ?? 0;
+    final TemplateSpellSlot? lastSlot = _getAvailableSlots().lastOrNull;
+    num maxSlot = lastSlot != null ? lastSlot.level : 0;
 
     List<Spell> filtered = widget.template.spells.where((spell) {
       if (spell.level > maxSlot) {
@@ -88,6 +102,20 @@ class _SpellSectionState extends State<SpellSection> {
           return a.name.compareTo(b.name);
 
         });
+
+    final Map<String, List<Spell>> spellsByLevel = {};
+    final Map<int, TemplateSpellSlot> slotsByLevel = {};
+
+    for (var slot in _getAvailableSlots()) {
+      slotsByLevel[slot.level] = slot;
+    }
+
+    for (var spell in sortedSpells) {
+      TemplateSpellSlot currSlot = slotsByLevel[spell.level]!;
+      final srcLevel = currSlot.srcLabel.replaceAll("{level}", currSlot.level.toString());
+      spellsByLevel.putIfAbsent(srcLevel, () => []);
+      spellsByLevel[srcLevel]!.add(spell);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

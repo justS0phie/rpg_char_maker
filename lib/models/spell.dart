@@ -33,10 +33,12 @@ class TemplateSpellSlot {
   final int level;
   final String maxFormula;
   final String srcLabel;
+  final String? requiredFormula;
 
   TemplateSpellSlot({
     required this.level,
     required this.maxFormula,
+    required this.requiredFormula,
     String? srcLabel
   }) : srcLabel = srcLabel ?? "LVL";
 }
