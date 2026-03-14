@@ -1,3 +1,6 @@
+import 'package:char_sheet_maker/models/item.dart';
+import 'package:char_sheet_maker/models/spell.dart';
+
 import 'equipment_item.dart';
 
 class CharacterSelection {
@@ -18,6 +21,9 @@ class Character {
   Map<String, CharacterSelection> selections;
 
   List<EquipmentItem> equipment;
+  List<InventoryItem> inventory;
+  List<Spell> spells;
+  List<SpellSlotUsage> spellSlotUsage;
 
   CharacterSelection selectionFor(String groupId) {
     return selections.putIfAbsent(
@@ -33,9 +39,15 @@ class Character {
 
     Map<String,dynamic>? values,
     Map<String, CharacterSelection>? selections,
-    List<EquipmentItem>? equipment
+    List<EquipmentItem>? equipment,
+    List<InventoryItem>? inventory,
+    List<Spell>? spells,
+    List<SpellSlotUsage>? spellSlotUsage
 
   })  : values = values ?? {},
         selections = selections ?? {},
-        equipment = equipment ?? [];
+        equipment = equipment ?? [],
+        inventory = inventory ?? [],
+        spellSlotUsage = spellSlotUsage ?? [],
+        spells = spells ?? [];
 }

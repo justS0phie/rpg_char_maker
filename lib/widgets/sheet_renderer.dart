@@ -8,6 +8,7 @@ import 'section_renderer.dart';
 
 class SheetRenderer extends StatelessWidget {
 
+  final TemplatePage page;
   final Template template;
   final Character character;
   final FieldControllerStore controllerStore;
@@ -15,6 +16,7 @@ class SheetRenderer extends StatelessWidget {
 
   const SheetRenderer({
     super.key,
+    required this.page,
     required this.template,
     required this.character,
     required this.controllerStore,
@@ -25,12 +27,14 @@ class SheetRenderer extends StatelessWidget {
 
     final map = <String, TemplateField>{};
 
-    for (var section in template.sections) {
-      for (var elem in section.elements.where((elem) {return elem.type == "field";})) {
-        final field = (elem as FieldElement).elem;
+    for (var eachPage in template.pages) {
+      for (var section in eachPage.sections) {
+        for (var elem in section.elements.where((elem) {return elem.type == "field";})) {
+          final field = (elem as FieldElement).elem;
 
-        if (field.alias != null) {
-          map[field.alias!] = field;
+          if (field.alias != null) {
+            map[field.alias!] = field;
+          }
         }
       }
     }
@@ -45,7 +49,7 @@ class SheetRenderer extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
 
-      children: template.sections.map((section) {
+      children: page.sections.map((section) {
 
         return SectionRenderer(
           section: section,
@@ -53,7 +57,7 @@ class SheetRenderer extends StatelessWidget {
           controllerStore: controllerStore,
           aliasMap: aliasMap,
           onValueChanged: onValueChanged,
-          template: template,
+          template: page.parent,
         );
 
       }).toList(),

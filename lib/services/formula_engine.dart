@@ -1,7 +1,9 @@
 import 'package:math_expressions/math_expressions.dart';
 
+import '../models/option.dart';
 import '../models/template.dart';
 import '../models/character.dart';
+import 'formula_functions.dart';
 import 'modifier_engine.dart';
 
 class FormulaEngine {
@@ -22,7 +24,7 @@ class FormulaEngine {
     final parser = GrammarParser();
 
     try {
-
+      expression = preprocess(expression);
       Expression exp = parser.parse(expression);
 
       ContextModel context = ContextModel();
@@ -43,6 +45,19 @@ class FormulaEngine {
           Number(modifiedValue.toDouble()),
         );
       });
+
+      for (OptionGroup group in template.optionGroups) {
+        CharacterSelection? groupSelections = character.selections.values.where((s) {return s.groupId == group.id;}).firstOrNull;
+        if (groupSelections == null) continue;
+
+        for (Option option in group.options) {
+          final variableName = "${group.name.toLowerCase()}_${option.name.toLowerCase()}";
+          context.bindVariable(
+            Variable(variableName),
+            Number(groupSelections.optionIds.contains(option.id) ? 1 : 0),
+          );
+        }
+      }
 
       final result = exp.evaluate(
         EvaluationType.REAL,

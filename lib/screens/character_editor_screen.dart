@@ -26,6 +26,7 @@ class _CharacterEditorScreenState
 
   late TextEditingController nameController;
   late FieldControllerStore controllerStore;
+  int currentPage = 0;
 
   @override
   void initState() {
@@ -33,29 +34,23 @@ class _CharacterEditorScreenState
 
     nameController =
         TextEditingController(text: widget.character.name);
-
     controllerStore = FieldControllerStore();
 
     _initializeCharacterValues();
   }
 
   void _initializeCharacterValues() {
-
-    for (var section in widget.template.sections) {
-
-      for (var elem in section.elements.where((elem) {return elem.type == "field";})) {
-        final field = (elem as FieldElement).elem;
-        if (!widget.character.values.containsKey(field.id)) {
-
-          if (field.defaultValue != null) {
-
-            widget.character.values[field.id] =
-                int.tryParse(field.defaultValue!) ?? field.defaultValue;
-
-          } else {
-
-            widget.character.values[field.id] = 0;
-
+    for (var page in widget.template.pages) {
+      for (var section in page.sections) {
+        for (var elem in section.elements.where((elem) {return elem.type == "field";})) {
+          final field = (elem as FieldElement).elem;
+          if (!widget.character.values.containsKey(field.id)) {
+            if (field.defaultValue != null) {
+              widget.character.values[field.id] =
+                  int.tryParse(field.defaultValue!) ?? field.defaultValue;
+            } else {
+              widget.character.values[field.id] = 0;
+            }
           }
         }
       }
@@ -102,8 +97,26 @@ class _CharacterEditorScreenState
 
           const Divider(),
 
+          Row(
+            children: template.pages.map((page) {
+              int index = template.pages.indexOf(page);
+              return ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    currentPage = index;
+                  });
+                },
+                child: Text(page.name),
+              );
+
+            }).toList(),
+          ),
+
+          const Divider(),
+
           Expanded(
             child: SheetRenderer(
+              page: template.pages[currentPage],
               template: template,
               character: character,
               controllerStore: controllerStore,

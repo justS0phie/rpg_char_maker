@@ -1,4 +1,5 @@
 import 'package:char_sheet_maker/models/sheet_element.dart';
+import 'package:char_sheet_maker/models/spell.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/option.dart';
 import '../models/template.dart';
@@ -100,13 +101,16 @@ class TemplateService {
           id: templateId,
           name: templateRow['name'],
           system: templateRow['system'],
-          sections: [],
+          pages: [],
           optionGroups: {},
-          fields: {}
+          fields: {},
+          slots: []
       );
 
-      final sections = await _fetchSections(template);
-      template.sections = sections;
+      final pages = await _fetchPages(template);
+      final slots = await _fetchSlots(template);
+      template.pages = pages;
+      template.slots = slots;
       await _loadOptionGroups(template, null);
       templates.add(template);
     }
@@ -114,11 +118,53 @@ class TemplateService {
     return templates;
   }
 
-  Future<List<TemplateSection>> _fetchSections(Template template) async {
+  Future<List<TemplateSpellSlot>> _fetchSlots(Template template) async {
+    final slots = await supabase
+        .from('template_spell_slots')
+        .select()
+        .eq('template_id', template.id)
+        .order('level');
+
+    return slots.map((s) {
+      return TemplateSpellSlot(
+        level: s['level'],
+        maxFormula: s['max_formula'],
+        srcLabel: s['src_label'],
+      );
+    }).toList();
+  }
+
+  Future<List<TemplatePage>> _fetchPages(Template template) async {
+    final sectionRows = await supabase
+        .from('template_pages')
+        .select()
+        .eq('template_id', template.id)
+        .order('order_index', ascending: true);
+
+    List<TemplatePage> pages = [];
+
+    for (final sectionRow in sectionRows) {
+      final sections = await _fetchSections(template, sectionRow['id']);
+
+      pages.add(
+        TemplatePage(
+          id: sectionRow['id'],
+          name: sectionRow['name'],
+          sections: sections,
+          parent: template
+        ),
+      );
+    }
+
+    return pages;
+  }
+
+  Future<List<TemplateSection>> _fetchSections(Template template, String pageId) async {
     final sectionRows = await supabase
         .from('template_sections')
         .select()
         .eq('template_id', template.id)
+        .eq('page_id', pageId)
         .order('display_order', ascending: true);
 
     List<TemplateSection> sections = [];

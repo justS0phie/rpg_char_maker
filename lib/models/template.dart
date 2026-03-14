@@ -1,11 +1,13 @@
 import 'package:char_sheet_maker/models/sheet_element.dart';
+import 'package:char_sheet_maker/models/spell.dart';
 import 'option.dart';
 
 class Template {
   final String id;
   final String name;
   final String system;
-  List<TemplateSection> sections;
+  List<TemplatePage> pages;
+  List<TemplateSpellSlot> slots;
   final Set<OptionGroup> optionGroups;
   final Set<TemplateField> fields;
 
@@ -13,9 +15,26 @@ class Template {
     required this.id,
     required this.name,
     required this.system,
-    required this.sections,
+    required this.pages,
     required this.optionGroups,
     required this.fields,
+    required this.slots,
+  });
+}
+
+class TemplatePage {
+
+  final String id;
+  final String name;
+  final Template parent;
+
+  final List<TemplateSection> sections;
+
+  TemplatePage({
+    required this.id,
+    required this.name,
+    required this.parent,
+    required this.sections,
   });
 }
 

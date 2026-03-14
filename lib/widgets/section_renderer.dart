@@ -1,4 +1,5 @@
 import 'package:char_sheet_maker/models/sheet_element.dart';
+import 'package:char_sheet_maker/widgets/spell_section.dart';
 import 'package:flutter/material.dart';
 
 import '../models/template.dart';
@@ -6,6 +7,7 @@ import '../models/character.dart';
 import '../services/field_controller_store.dart';
 import 'abilities_section.dart';
 import 'field_renderer.dart';
+import 'inventory_section.dart';
 import 'option_group_widget.dart';
 import 'equipment_section.dart';
 
@@ -37,11 +39,23 @@ class SectionRenderer extends StatelessWidget {
         template: template,
       );
     } else if (section.type == "abilities") {
-
       return AbilitiesSection(
         template: template,
         character: character,
         onChanged: onValueChanged,
+      );
+    } else if (section.type == "inventory") {
+      return InventorySection(
+        character: character,
+        onChanged: onValueChanged,
+      );
+    } else if (section.type == "spells" || section.type == "spells_simple") {
+      return SpellSection(
+        character: character,
+        template: template,
+        aliasMap: aliasMap,
+        onChanged: onValueChanged,
+        usePreparing: section.type == "spells",
       );
     }
 
