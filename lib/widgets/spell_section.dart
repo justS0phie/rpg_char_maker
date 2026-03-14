@@ -30,18 +30,7 @@ class _SpellSectionState extends State<SpellSection> {
   String? selectedSpellId;
 
   List<TemplateSpellSlot> _getAvailableSlots() {
-    return widget.template.slots.where((slot) {
-      print("---------------");
-      print(slot.srcLabel);
-      print(slot.maxFormula);
-      print(slot.requiredFormula);
-      if (slot.requiredFormula != null) {
-        if (FormulaEngine.evaluate(slot.requiredFormula, widget.character, widget.aliasMap, widget.template) == 0) {
-          return false;
-        }
-      }
-      return FormulaEngine.evaluate(slot.maxFormula, widget.character, widget.aliasMap, widget.template) > 0;
-    }).toList();
+    return getAvailableSlotsForChar(widget.template, widget.character, widget.aliasMap);
   }
 
   List<Spell> _getAvailableSpells() {

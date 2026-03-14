@@ -72,4 +72,64 @@ class FormulaEngine {
       return 0;
     }
   }
+
+  static double safeEvaluate(
+      String? expression,
+      Character character,
+      Map<String, TemplateField> aliasMap,
+      Template template
+      ) {
+
+    if (expression == null) {
+      return 0;
+    }
+
+    final parser = GrammarParser();
+
+    try {
+      expression = preprocess(expression);
+      Expression exp = parser.parse(expression);
+
+      ContextModel context = ContextModel();
+
+      /// assign values for aliases
+      aliasMap.forEach((alias, templateField) {
+
+        final value =
+            character.values[templateField.id] ?? 0;
+
+        context.bindVariable(
+          Variable(alias),
+          Number(value),
+        );
+      });
+
+      for (OptionGroup group in template.optionGroups) {
+        CharacterSelection? groupSelections = character.selections.values.where((s) {return s.groupId == group.id;}).firstOrNull;
+        if (groupSelections == null) continue;
+
+        for (Option option in group.options) {
+          final variableName = "${group.name.toLowerCase()}_${option.name.toLowerCase()}";
+          context.bindVariable(
+            Variable(variableName),
+            Number(groupSelections.optionIds.contains(option.id) ? 1 : 0),
+          );
+        }
+      }
+
+      final result = exp.evaluate(
+        EvaluationType.REAL,
+        context,
+      );
+
+      return result;
+
+    } catch (e) {
+
+      print("Formula error: $expression");
+      print(e);
+
+      return 0;
+    }
+  }
 }

@@ -22,7 +22,7 @@ class ModifierEngine {
             .firstWhere((o) => o.id == optionId);
         for (final effect in option.effects) {
 
-          final modifier = FormulaEngine.evaluate(
+          final modifier = FormulaEngine.safeEvaluate(
             effect.formula,
             character,
             aliasMap,
