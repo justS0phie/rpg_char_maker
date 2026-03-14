@@ -1,7 +1,3 @@
-import 'package:char_sheet_maker/models/template.dart';
-
-import 'character.dart';
-
 class Spell {
 
   String id;
