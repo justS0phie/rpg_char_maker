@@ -104,18 +104,48 @@ class TemplateService {
           pages: [],
           optionGroups: {},
           fields: {},
-          slots: []
+          slots: [],
+          spells: []
       );
 
       final pages = await _fetchPages(template);
       final slots = await _fetchSlots(template);
+      final spells = await _fetchSpells(template);
       template.pages = pages;
       template.slots = slots;
+      template.spells = spells;
       await _loadOptionGroups(template, null);
       templates.add(template);
     }
 
     return templates;
+  }
+
+  Future<List<Spell>> _fetchSpells(Template template) async {
+    final rows = await supabase
+        .from('spells')
+        .select()
+        .eq('template_id', template.id);
+
+    List<Spell> spells = [];
+
+    for (final row in rows) {
+      final spellRequirements = await supabase
+          .from('spell_requirements')
+          .select()
+          .eq('spell_id', row['id']);
+
+      spells.add(
+        Spell(
+            id: row['id'],
+            name: row['name'],
+            description: row['description'],
+            requiredOptions: spellRequirements.map((r) => r['option_id'] as String).toList()
+        ),
+      );
+    }
+
+    return spells;
   }
 
   Future<List<TemplateSpellSlot>> _fetchSlots(Template template) async {

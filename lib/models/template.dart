@@ -8,6 +8,7 @@ class Template {
   final String system;
   List<TemplatePage> pages;
   List<TemplateSpellSlot> slots;
+  List<Spell> spells;
   final Set<OptionGroup> optionGroups;
   final Set<TemplateField> fields;
 
@@ -16,9 +17,10 @@ class Template {
     required this.name,
     required this.system,
     required this.pages,
+    required this.slots,
+    required this.spells,
     required this.optionGroups,
     required this.fields,
-    required this.slots,
   });
 }
 

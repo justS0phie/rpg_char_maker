@@ -1,31 +1,74 @@
+import 'package:char_sheet_maker/widgets/spell_slots_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../models/template.dart';
 import '../models/character.dart';
 import '../models/spell.dart';
-import '../models/template.dart';
-import 'spell_slots_widget.dart';
 
-class SpellSection extends StatelessWidget {
+class SpellSection extends StatefulWidget {
+  final Template template;
   final Character character;
   final VoidCallback onChanged;
   final bool usePreparing;
-  final Template template;
   final Map<String, TemplateField> aliasMap;
 
   const SpellSection({
     super.key,
+    required this.template,
     required this.character,
     required this.onChanged,
-    required this.template,
     required this.usePreparing,
     required this.aliasMap,
   });
 
   @override
+  State<SpellSection> createState() => _SpellSectionState();
+}
+
+class _SpellSectionState extends State<SpellSection> {
+  String? selectedSpellId;
+
+  List<Spell> _getAvailableSpells() {
+    final selectedOptions = widget.character.selections.values
+        .expand((s) => s.optionIds)
+        .toSet();
+
+    return widget.template.spells.where((spell) {
+      if (spell.requiredOptions.isEmpty) {
+        return true;
+      }
+
+      return spell.requiredOptions.any((opt) => selectedOptions.contains(opt));
+    }).toList();
+  }
+
+  Spell _getSpellById(String id) {
+    return widget.template.spells.firstWhere((s) => s.id == id);
+  }
+
+  void _addSpell() {
+    if (selectedSpellId == null) return;
+    widget.character.spells.add(selectedSpellId!);
+    selectedSpellId = null;
+    widget.onChanged();
+    setState(() {});
+  }
+
+  void _removeSpell(int index) {
+    widget.character.spells.removeAt(index);
+    widget.onChanged();
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final availableSpells = _getAvailableSpells();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(height: 20),
+
         const Text(
           "Spells",
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -34,95 +77,72 @@ class SpellSection extends StatelessWidget {
         const SizedBox(height: 10),
 
         SpellSlotsWidget(
-          character: character,
-          template: template,
-          aliasMap: aliasMap,
-          onChanged: onChanged,
+          character: widget.character,
+          template: widget.template,
+          aliasMap: widget.aliasMap,
+          onChanged: widget.onChanged,
         ),
 
         const SizedBox(height: 20),
 
-        ...character.spells.map((spell) {
-          final nameController = TextEditingController(text: spell.name);
-
-          final levelController = TextEditingController(text: spell.level);
-
-          return ExpansionTile(
-            title: Row(
-              children: [
-                usePreparing ? Checkbox(
-                  value: spell.prepared,
-                  onChanged: (v) {
-                    spell.prepared = v ?? false;
-                    onChanged();
-                  },
-                ) : Container(),
-
-                Expanded(
-                  child: TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(hintText: "Spell name"),
-                    onChanged: (v) {
-                      spell.name = v;
-                      onChanged();
-                    },
-                  ),
-                ),
-
-                const SizedBox(width: 10),
-
-                SizedBox(
-                  width: 40,
-                  child: TextField(
-                    controller: levelController,
-                    textAlign: TextAlign.center,
-                    decoration: const InputDecoration(hintText: "Lvl"),
-                    onChanged: (v) {
-                      spell.level = v;
-                      onChanged();
-                    },
-                  ),
-                ),
-
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    character.spells.remove(spell);
-                    onChanged();
-                  },
-                ),
-              ],
+        Row(
+          children: [
+            Expanded(
+              child: DropdownButton<String>(
+                value: selectedSpellId,
+                hint: const Text("Select spell"),
+                isExpanded: true,
+                items: availableSpells.map((spell) {
+                  return DropdownMenuItem(
+                    value: spell.id,
+                    child: Text("${spell.name} (Lv ${spell.level})"),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedSpellId = value;
+                  });
+                },
+              ),
             ),
 
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: TextField(
-                  controller: TextEditingController(text: spell.description),
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    hintText: "Spell description",
-                  ),
-                  onChanged: (v) {
-                    spell.description = v;
-                    onChanged();
-                  },
+            const SizedBox(width: 10),
+
+            ElevatedButton(onPressed: _addSpell, child: const Text("Add")),
+          ],
+        ),
+
+        const SizedBox(height: 20),
+
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: widget.character.spells.length,
+          itemBuilder: (context, index) {
+            final charSpell = widget.character.spells[index];
+
+            final spell = _getSpellById(charSpell);
+
+            return Card(
+              child: ListTile(
+                title: Text(spell.name),
+
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Level ${spell.level}"),
+                    const SizedBox(height: 4),
+                    Text(spell.description),
+                  ],
+                ),
+
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => _removeSpell(index),
                 ),
               ),
-            ],
-          );
-        }),
-
-        const SizedBox(height: 10),
-
-        ElevatedButton(
-          onPressed: () {
-            character.spells.add(
-              Spell(id: DateTime.now().toString(), name: ""),
             );
-            onChanged();
           },
-          child: const Text("Add Spell"),
         ),
       ],
     );

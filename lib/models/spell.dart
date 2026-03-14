@@ -1,3 +1,7 @@
+import 'package:char_sheet_maker/models/template.dart';
+
+import 'character.dart';
+
 class Spell {
 
   String id;
@@ -7,6 +11,7 @@ class Spell {
   bool prepared;
 
   String description;
+  final List<String> requiredOptions;
 
   Spell({
     required this.id,
@@ -14,6 +19,7 @@ class Spell {
     this.level = "0",
     this.prepared = false,
     this.description = "",
+    required this.requiredOptions,
   });
 }
 
