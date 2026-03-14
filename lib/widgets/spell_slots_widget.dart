@@ -35,9 +35,9 @@ class SpellSlotsWidget extends StatelessWidget {
           double maxSlots = FormulaEngine.evaluate(slot.maxFormula, character, aliasMap, template);
 
           var usage = character.spellSlotUsage.firstWhere(
-            (u) => u.level == slot.level,
+            (u) => u.id == slot.id,
             orElse: () {
-              final u = SpellSlotUsage(level: slot.level);
+              final u = SpellSlotUsage(id: slot.id);
               character.spellSlotUsage.add(u);
               return u;
             },

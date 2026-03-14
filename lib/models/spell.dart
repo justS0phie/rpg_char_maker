@@ -25,22 +25,24 @@ class Spell {
 }
 
 class SpellSlotUsage {
-  int level;
+  String id;
   int used;
 
   SpellSlotUsage({
-    required this.level,
+    required this.id,
     this.used = 0,
   });
 }
 
 class TemplateSpellSlot {
+  final String id;
   final int level;
   final String maxFormula;
   final String srcLabel;
   final String? requiredFormula;
 
   TemplateSpellSlot({
+    required this.id,
     required this.level,
     required this.maxFormula,
     required this.requiredFormula,

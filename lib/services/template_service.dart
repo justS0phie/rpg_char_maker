@@ -158,6 +158,7 @@ class TemplateService {
 
     return slots.map((s) {
       return TemplateSpellSlot(
+        id: s['id'],
         level: s['level'],
         maxFormula: s['max_formula'],
         requiredFormula: s['required_formula'],
