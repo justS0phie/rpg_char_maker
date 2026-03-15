@@ -41,7 +41,7 @@ class _SpellSectionState extends State<SpellSection> {
 
   List<Spell> _getAvailableSpells() {
     final selectedOptions = widget.character.selections.values
-        .expand((s) => s.optionIds)
+        .expand((s) => s)
         .toSet();
 
     final TemplateSpellSlot? lastSlot = _getAvailableSlots().lastOrNull;

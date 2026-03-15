@@ -3,33 +3,33 @@ import 'package:char_sheet_maker/models/spell.dart';
 
 import 'equipment_item.dart';
 
-class CharacterSelection {
-  final String groupId;
-  final Set<String> optionIds;
-
-  CharacterSelection({
-    required this.groupId,
-    Set<String>? optionIds,
-  }) : optionIds = optionIds ?? {};
-}
 
 class Character {
   final String id;
   String name;
   String templateId;
   Map<String,dynamic> values;
-  Map<String, CharacterSelection> selections;
+  Map<String, Set<String>> selections;
 
   List<EquipmentItem> equipment;
   List<InventoryItem> inventory;
   Set<String> spells;
   List<SpellSlotUsage> spellSlotUsage;
 
-  CharacterSelection selectionFor(String groupId) {
-    return selections.putIfAbsent(
-      groupId,
-          () => CharacterSelection(groupId: groupId),
-    );
+  Set<String> selectionFor(String groupId) {
+    return selections.putIfAbsent(groupId, () => {});
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "templateId": templateId,
+      "values": values,
+      "selections": selections,
+      "equipment": equipment.map((e) => e.toJson()).toList(),
+      "inventory": inventory.map((i) => i.toJson()).toList(),
+      "spells": spells.toList(),
+    };
   }
 
   Character({
@@ -38,7 +38,7 @@ class Character {
     required this.templateId,
 
     Map<String,dynamic>? values,
-    Map<String, CharacterSelection>? selections,
+    Map<String, Set<String>>? selections,
     List<EquipmentItem>? equipment,
     List<InventoryItem>? inventory,
     Set<String>? spells,
@@ -50,4 +50,29 @@ class Character {
         inventory = inventory ?? [],
         spellSlotUsage = spellSlotUsage ?? [],
         spells = spells ?? {};
+
+  factory Character.fromJson(Map<String,dynamic> json) {
+
+    final character = Character(
+      id: json["id"],
+      name: json["name"],
+      templateId: json["templateId"],
+      spells: json["spells"]
+    );
+
+    character.values = Map<String,dynamic>.from(json["values"] ?? {});
+    character.selections = Map<String, Set<String>>.from(json["selections"] ?? {});
+
+    character.equipment =
+        (json["equipment"] ?? [])
+            .map<EquipmentItem>((e) => EquipmentItem.fromJson(e))
+            .toList();
+
+    character.inventory =
+        (json["inventory"] ?? [])
+            .map<InventoryItem>((i) => InventoryItem.fromJson(i))
+            .toList();
+
+    return character;
+  }
 }

@@ -23,9 +23,9 @@ class OptionGroupWidget extends StatelessWidget {
 
     /// SINGLE SELECT (dropdown)
     if (!group.multiSelect) {
-      final selected = selection.optionIds.isEmpty
+      final selected = selection.isEmpty
           ? null
-          : selection.optionIds.first;
+          : selection.first;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +44,7 @@ class OptionGroupWidget extends StatelessWidget {
             }).toList(),
 
             onChanged: (value) {
-              selection.optionIds
+              selection
                 ..clear()
                 ..add(value!);
 
@@ -63,7 +63,7 @@ class OptionGroupWidget extends StatelessWidget {
         Text(group.name),
 
         ...group.options.map((option) {
-          final isSelected = selection.optionIds.contains(option.id);
+          final isSelected = selection.contains(option.id);
 
           return CheckboxListTile(
             title: Text(option.name),
@@ -72,9 +72,9 @@ class OptionGroupWidget extends StatelessWidget {
 
             onChanged: (checked) {
               if (checked == true) {
-                selection.optionIds.add(option.id);
+                selection.add(option.id);
               } else {
-                selection.optionIds.remove(option.id);
+                selection.remove(option.id);
               }
 
               onChanged();

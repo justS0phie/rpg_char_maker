@@ -45,14 +45,14 @@ class FormulaEngine {
       });
 
       for (OptionGroup group in template.optionGroups) {
-        CharacterSelection? groupSelections = character.selections.values.where((s) {return s.groupId == group.id;}).firstOrNull;
-        if (groupSelections == null) continue;
+        Set<String> groupSelections = character.selectionFor(group.id);
+        if (groupSelections.isEmpty) continue;
 
         for (Option option in group.options) {
           final variableName = "${(group.alias ?? group.name).toLowerCase()}_${(option.alias ?? option.name).toLowerCase()}";
           context.bindVariable(
             Variable(variableName),
-            Number(groupSelections.optionIds.contains(option.id) ? 1 : 0),
+            Number(groupSelections.contains(option.id) ? 1 : 0),
           );
         }
       }
@@ -105,14 +105,14 @@ class FormulaEngine {
       });
 
       for (OptionGroup group in template.optionGroups) {
-        CharacterSelection? groupSelections = character.selections.values.where((s) {return s.groupId == group.id;}).firstOrNull;
-        if (groupSelections == null) continue;
+        Set<String> groupSelections = character.selectionFor(group.id);
+        if (groupSelections.isEmpty) continue;
 
         for (Option option in group.options) {
           final variableName = "${group.name.toLowerCase()}_${option.name.toLowerCase()}";
           context.bindVariable(
             Variable(variableName),
-            Number(groupSelections.optionIds.contains(option.id) ? 1 : 0),
+            Number(groupSelections.contains(option.id) ? 1 : 0),
           );
         }
       }

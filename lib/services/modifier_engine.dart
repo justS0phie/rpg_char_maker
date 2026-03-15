@@ -12,12 +12,10 @@ class ModifierEngine {
     Map<String,double> modifiers = {};
 
     for (final group in template.optionGroups) {
-      final selection =
-      character.selections[group.id];
+      final selection = character.selectionFor(group.id);
+      if (selection.isEmpty) continue;
 
-      if (selection == null) continue;
-
-      for (final optionId in selection.optionIds) {
+      for (final optionId in selection) {
         final option = group.options
             .firstWhere((o) => o.id == optionId);
         for (final effect in option.effects) {

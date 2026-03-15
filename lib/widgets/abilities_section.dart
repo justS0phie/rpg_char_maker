@@ -25,11 +25,11 @@ class AbilitiesSection extends StatelessWidget {
     final level = lvlField != null ? character.values[lvlField.id] ?? 0 : 0;
 
     for (OptionGroup group in template.optionGroups) {
-      CharacterSelection? groupSelections = character.selections.values.where((s) {return s.groupId == group.id;}).firstOrNull;
-      if (groupSelections == null) continue;
+      Set<String> groupSelections = character.selectionFor(group.id);
+      if (groupSelections.isEmpty) continue;
 
       for (Option option in group.options) {
-        if (groupSelections.optionIds.contains(option.id)){
+        if (groupSelections.contains(option.id)){
           abilities.addAll(option.abilities.where((ability) {return level >= ability.levelRequired;}));
         }
       }
