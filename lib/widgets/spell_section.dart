@@ -182,6 +182,7 @@ class _SpellSectionState extends State<SpellSection> {
 
                 ...spells.map((spell) {
                   return Card(
+                    key: Key(spell.id),
                     child: ExpansionTile(
                       initiallyExpanded: expandedSpells[spell.id] ?? false,
                       onExpansionChanged: (value) {

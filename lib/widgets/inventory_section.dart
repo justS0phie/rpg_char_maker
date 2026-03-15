@@ -29,6 +29,7 @@ class InventorySection extends StatelessWidget {
           final amountController = TextEditingController(text: item.amount);
 
           return Row(
+            key: Key(item.id),
             children: [
               /// ITEM NAME
               Expanded(

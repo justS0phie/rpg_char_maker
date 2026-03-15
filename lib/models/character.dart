@@ -28,12 +28,17 @@ class Character {
   }
 
   Map<String, dynamic> toJson() {
+    Map<String, List<String>> jsonSelections = {};
+    for (var key in selections.keys) {
+      jsonSelections[key] = selections[key]!.toList();
+    }
+
     return {
       "id": id,
       "name": name,
       "templateId": templateId,
       "values": values,
-      "selections": selections,
+      "selections": jsonSelections,
       "equipment": equipment.map((e) => e.toJson()).toList(),
       "inventory": inventory.map((i) => i.toJson()).toList(),
       "spells": spells.toList(),
@@ -69,7 +74,13 @@ class Character {
     );
 
     character.values = Map<String,dynamic>.from(json["values"] ?? {});
-    character.selections = Map<String, Set<String>>.from(json["selections"] ?? {});
+
+    Map<String, Set<String>> jsonSelections = {};
+    for (var key in (json["selections"] ?? {}).keys) {
+      jsonSelections[key] = Set<String>.from(json["selections"][key]!);
+    }
+
+    character.selections = jsonSelections;
 
     character.equipment =
         (json["equipment"] ?? [])
@@ -85,9 +96,10 @@ class Character {
   }
 
   Future<File> saveCharacter() async {
+    final jsonData = jsonEncode(toJson());
+    print(jsonData);
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/$id.json');
-    final jsonData = jsonEncode(toJson());
 
     return file.writeAsString(jsonData);
   }
