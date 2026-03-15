@@ -97,7 +97,6 @@ class Character {
 
   Future<File> saveCharacter() async {
     final jsonData = jsonEncode(toJson());
-    print(jsonData);
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/$id.json');
 
