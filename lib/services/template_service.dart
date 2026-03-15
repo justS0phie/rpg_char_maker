@@ -31,6 +31,7 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId
       OptionGroup(
         id: group['id'],
         name: group['name'],
+        alias: group['alias'],
         required: group['required'] ?? false,
         multiSelect: group['multi_select'] ?? false,
         options: options,

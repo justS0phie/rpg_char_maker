@@ -30,7 +30,11 @@ class _SpellSectionState extends State<SpellSection> {
   String? selectedSpellId;
 
   List<TemplateSpellSlot> _getAvailableSlots() {
-    return getAvailableSlotsForChar(widget.template, widget.character, widget.aliasMap);
+    return getAvailableSlotsForChar(
+      widget.template,
+      widget.character,
+      widget.aliasMap,
+    );
   }
 
   List<Spell> _getAvailableSpells() {
@@ -77,31 +81,33 @@ class _SpellSectionState extends State<SpellSection> {
   Widget build(BuildContext context) {
     final availableSpells = _getAvailableSpells();
     final List<Spell> sortedSpells =
-      widget.character.spells
-          .map((cs) => _getSpellById(cs))
-          .toList()
-        ..sort((a, b) {
+        widget.character.spells.map((cs) => _getSpellById(cs)).toList()
+          ..sort((a, b) {
+            final levelCompare = a.level.compareTo(b.level);
 
-          final levelCompare = a.level.compareTo(b.level);
+            if (levelCompare != 0) {
+              return levelCompare;
+            }
 
-          if (levelCompare != 0) {
-            return levelCompare;
-          }
-
-          return a.name.compareTo(b.name);
-
-        });
+            return a.name.compareTo(b.name);
+          });
 
     final Map<String, List<Spell>> spellsByLevel = {};
     final Map<int, TemplateSpellSlot> slotsByLevel = {};
 
     for (var slot in _getAvailableSlots()) {
       slotsByLevel[slot.level] = slot;
+      for (int index in Iterable.generate(slot.level)) {
+        slotsByLevel.putIfAbsent(index, () => slot);
+      }
     }
 
     for (var spell in sortedSpells) {
       TemplateSpellSlot currSlot = slotsByLevel[spell.level]!;
-      final srcLevel = currSlot.srcLabel.replaceAll("{level}", currSlot.level.toString());
+      final srcLevel = currSlot.srcLabel.replaceAll(
+        "{level}",
+        currSlot.level.toString(),
+      );
       spellsByLevel.putIfAbsent(srcLevel, () => []);
       spellsByLevel[srcLevel]!.add(spell);
     }
@@ -152,37 +158,54 @@ class _SpellSectionState extends State<SpellSection> {
 
         const SizedBox(height: 20),
 
-        ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: sortedSpells.length,
-          itemBuilder: (context, index) {
-            final spell = sortedSpells[index];
+        Column(
+          children: spellsByLevel.entries.map((entry) {
+            final level = entry.key;
+            final spells = entry.value;
 
-            return Card(
-              child: ListTile(
-                title: Text(spell.name),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
 
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Level ${spell.level}"),
-                    const SizedBox(height: 4),
-                    Text(spell.description),
-                  ],
+                Text(
+                  level,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
 
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    widget.character.spells.removeWhere((s) => s == spell.id);
-                    widget.onChanged();
-                    setState(() {});
-                  },
-                ),
-              ),
+                const SizedBox(height: 8),
+
+                ...spells.map((spell) {
+                  return Card(
+                    child: ListTile(
+                      title: Text(spell.name),
+
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Level ${spell.level}"),
+                          const SizedBox(height: 4),
+                          Text(spell.description),
+                        ],
+                      ),
+
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete),
+                        onPressed: () {
+                          widget.character.spells.removeWhere((s) => s == spell.id);
+                          widget.onChanged();
+                          setState(() {});
+                        },
+                      ),
+                    ),
+                  );
+                }),
+              ],
             );
-          },
+          }).toList(),
         ),
       ],
     );

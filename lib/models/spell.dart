@@ -51,12 +51,14 @@ class TemplateSpellSlot {
 }
 
 List<TemplateSpellSlot> getAvailableSlotsForChar(Template template, Character character, Map<String, TemplateField> aliasMap) {
-  return template.slots.where((slot) {
+  List<TemplateSpellSlot> result = template.slots.where((slot) {
     if (slot.requiredFormula != null) {
-      if (FormulaEngine.evaluate(slot.requiredFormula, character, aliasMap, template) == 0) {
+      if (FormulaEngine.evaluate(slot.requiredFormula, character, aliasMap, template) <= 0) {
         return false;
       }
     }
     return FormulaEngine.evaluate(slot.maxFormula, character, aliasMap, template) > 0;
   }).toList();
+  result.sort((a, b) => a.level.compareTo(b.level));
+  return result;
 }

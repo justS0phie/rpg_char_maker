@@ -49,7 +49,7 @@ class FormulaEngine {
         if (groupSelections == null) continue;
 
         for (Option option in group.options) {
-          final variableName = "${group.name.toLowerCase()}_${option.name.toLowerCase()}";
+          final variableName = "${(group.alias ?? group.name).toLowerCase()}_${(option.alias ?? option.name).toLowerCase()}";
           context.bindVariable(
             Variable(variableName),
             Number(groupSelections.optionIds.contains(option.id) ? 1 : 0),

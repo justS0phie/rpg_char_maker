@@ -1,6 +1,7 @@
 class OptionGroup {
   final String id;
   final String name;
+  final String? alias;
   final bool required;
   final bool multiSelect;
   final List<Option> options;
@@ -10,6 +11,7 @@ class OptionGroup {
   OptionGroup({
     required this.id,
     required this.name,
+    required this.alias,
     required this.required,
     required this.multiSelect,
     required this.options,
@@ -73,6 +75,7 @@ class OptionAbility {
 class Option {
   final String id;
   final String name;
+  final String? alias;
   final String description;
 
   final List<OptionEffect> effects;
@@ -84,6 +87,7 @@ class Option {
     required this.description,
     required this.effects,
     required this.abilities,
+    required this.alias,
   });
 
   factory Option.fromJson(
@@ -95,6 +99,7 @@ class Option {
       id: json['id'],
       name: json['name'],
       description: json['description'] ?? "",
+      alias: json['alias'],
       effects: effects,
       abilities: abilities,
     );
