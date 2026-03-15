@@ -22,7 +22,7 @@ class Character {
 
   List<EquipmentItem> equipment;
   List<InventoryItem> inventory;
-  List<String> spells;
+  Set<String> spells;
   List<SpellSlotUsage> spellSlotUsage;
 
   CharacterSelection selectionFor(String groupId) {
@@ -41,7 +41,7 @@ class Character {
     Map<String, CharacterSelection>? selections,
     List<EquipmentItem>? equipment,
     List<InventoryItem>? inventory,
-    List<String>? spells,
+    Set<String>? spells,
     List<SpellSlotUsage>? spellSlotUsage
 
   })  : values = values ?? {},
@@ -49,5 +49,5 @@ class Character {
         equipment = equipment ?? [],
         inventory = inventory ?? [],
         spellSlotUsage = spellSlotUsage ?? [],
-        spells = spells ?? [];
+        spells = spells ?? {};
 }

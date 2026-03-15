@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../models/option.dart';
 import '../models/template.dart';
@@ -55,7 +56,7 @@ class AbilitiesSection extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
 
-                Text(ability.description),
+                MarkdownBody(data: ability.description),
 
                 if (ability.optionGroupId != null)
                   OptionGroupWidget(

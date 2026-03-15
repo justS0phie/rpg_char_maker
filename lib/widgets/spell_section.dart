@@ -1,9 +1,11 @@
 import 'package:char_sheet_maker/widgets/spell_slots_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 
 import '../models/template.dart';
 import '../models/character.dart';
 import '../models/spell.dart';
+import '../services/spell_formula_engine.dart';
 
 class SpellSection extends StatefulWidget {
   final Template template;
@@ -27,6 +29,7 @@ class SpellSection extends StatefulWidget {
 
 class _SpellSectionState extends State<SpellSection> {
   String? selectedSpellId;
+  Map<String, bool> expandedSpells = {};
 
   List<TemplateSpellSlot> _getAvailableSlots() {
     return getAvailableSlotsForChar(
@@ -179,26 +182,56 @@ class _SpellSectionState extends State<SpellSection> {
 
                 ...spells.map((spell) {
                   return Card(
-                    child: ListTile(
-                      title: Text(spell.name),
-
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    child: ExpansionTile(
+                      initiallyExpanded: expandedSpells[spell.id] ?? false,
+                      onExpansionChanged: (value) {
+                        expandedSpells[spell.id] = value;
+                      },
+                      title: Row(
                         children: [
-                          Text("Level ${spell.level}"),
-                          const SizedBox(height: 4),
-                          Text(spell.description),
+                          Expanded(
+                            child: Text(
+                              spell.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "Level ${spell.level}",
+                            style: const TextStyle(color: Colors.grey),
+                          ),
                         ],
                       ),
 
                       trailing: IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
-                          widget.character.spells.removeWhere((s) => s == spell.id);
+                          widget.character.spells.removeWhere(
+                            (s) => s == spell.id,
+                          );
                           widget.onChanged();
                           setState(() {});
                         },
                       ),
+
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Row(
+                            children: [
+                              MarkdownBody(
+                                data: parseDescription(
+                                  spell.description,
+                                  widget.character,
+                                  widget.template,
+                                  widget.aliasMap,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 }),
