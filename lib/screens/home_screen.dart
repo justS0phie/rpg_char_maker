@@ -1,4 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/v4.dart';
 
 import '../models/character.dart';
@@ -14,7 +18,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   final templateService = TemplateService();
 
   List<Template> templates = [];
@@ -28,6 +31,29 @@ class _HomeScreenState extends State<HomeScreen> {
     loadTemplates();
   }
 
+  Future<List<Character>> loadSavedCharacters() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final files = dir.listSync();
+
+    List<Character> characters = [];
+
+    for (var file in files) {
+      if (file is File && file.path.endsWith(".json")) {
+        try {
+          final jsonString = await file.readAsString();
+          final jsonData = jsonDecode(jsonString);
+          final character = Character.fromJson(jsonData);
+
+          characters.add(character);
+        } catch (e) {
+          print("Failed to load character file: ${file.path}");
+        }
+      }
+    }
+
+    return characters;
+  }
+
   Future<void> loadTemplates() async {
     templates = await templateService.fetchTemplates();
 
@@ -37,7 +63,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void createCharacter(Template template) {
-
     final character = Character(
       id: UuidV4().generate(),
       name: "New Character",
@@ -49,33 +74,25 @@ class _HomeScreenState extends State<HomeScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CharacterEditorScreen(
-          character: character,
-          template: template,
-        ),
+        builder: (_) =>
+            CharacterEditorScreen(character: character, template: template),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
     if (loading) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Characters"),
-      ),
+      appBar: AppBar(title: const Text("Characters")),
 
       body: ListView(
         children: characters.map((character) {
-
           final template = templates.firstWhere(
-                (t) => t.id == character.templateId,
+            (t) => t.id == character.templateId,
           );
 
           return ListTile(
@@ -83,7 +100,9 @@ class _HomeScreenState extends State<HomeScreen> {
             subtitle: Text(template.name),
 
             onTap: () async {
-              final fullTemplate = await TemplateService().loadTemplate(template.id);
+              final fullTemplate = await TemplateService().loadTemplate(
+                template.id,
+              );
 
               Navigator.push(
                 context,
@@ -94,10 +113,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               );
-
             },
           );
-
         }).toList(),
       ),
 
@@ -109,25 +126,23 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showTemplatePicker() {
-
     showModalBottomSheet(
       context: context,
       builder: (context) {
-
         return ListView(
           children: templates.map((template) {
-
             return ListTile(
               title: Text(template.name),
               subtitle: Text(template.system),
 
               onTap: () async {
-                final fullTemplate = await TemplateService().loadTemplate(template.id);
+                final fullTemplate = await TemplateService().loadTemplate(
+                  template.id,
+                );
                 Navigator.pop(context);
                 createCharacter(fullTemplate);
               },
             );
-
           }).toList(),
         );
       },

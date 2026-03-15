@@ -29,6 +29,7 @@ class Character {
 
   Map<String, dynamic> toJson() {
     return {
+      "id": id,
       "name": name,
       "templateId": templateId,
       "values": values,
@@ -61,7 +62,7 @@ class Character {
   factory Character.fromJson(Map<String,dynamic> json) {
 
     final character = Character(
-      id: UuidV4().generate(),
+      id: json["id"] ?? UuidV4().generate(),
       name: json["name"],
       templateId: json["templateId"],
       spells: json["spells"]
@@ -85,7 +86,7 @@ class Character {
 
   Future<File> saveCharacter() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/characters/$id.json');
+    final file = File('${dir.path}/$id.json');
     final jsonData = jsonEncode(toJson());
 
     return file.writeAsString(jsonData);
@@ -101,8 +102,10 @@ class Character {
   Future<void> exportCharacter() async {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/character_export.json');
+    final jsonData = toJson();
+    jsonData.remove("id");
 
-    await file.writeAsString(jsonEncode(toJson()));
+    await file.writeAsString(jsonEncode(jsonData));
     await Share.shareXFiles([XFile(file.path)]);
   }
 
