@@ -1,4 +1,5 @@
 import 'package:char_sheet_maker/models/sheet_element.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../models/character.dart';
@@ -98,7 +99,7 @@ class _CharacterEditorScreenState
           const Divider(),
 
           Row(
-            children: template.pages.map((page) {
+            children: template.pages.sorted((a, b) => a.order.compareTo(b.order)).map((page) {
               int index = template.pages.indexOf(page);
               return ElevatedButton(
                 onPressed: () {

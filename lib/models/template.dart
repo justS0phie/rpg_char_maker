@@ -62,6 +62,7 @@ class Template {
       .map<TemplatePage>((p) => TemplatePage(
       id: p['id'],
       name: p['name'],
+      order: p['order_index'],
       sections: List.from(p["template_sections"].map((s) => TemplateSection(
         id: s["id"],
         name: s['name'],
@@ -111,6 +112,7 @@ class TemplatePage {
 
   final String id;
   final String name;
+  final int order;
   final Template parent;
 
   final List<TemplateSection> sections;
@@ -118,6 +120,7 @@ class TemplatePage {
   TemplatePage({
     required this.id,
     required this.name,
+    required this.order,
     required this.parent,
     required this.sections,
   });

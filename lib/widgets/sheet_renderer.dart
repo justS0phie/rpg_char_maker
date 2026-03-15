@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'package:flutter/material.dart';
 
@@ -49,7 +50,7 @@ class SheetRenderer extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
 
-      children: page.sections.map((section) {
+      children: page.sections.sorted((a, b) => a.order.compareTo(b.order)).map((section) {
 
         return SectionRenderer(
           section: section,
