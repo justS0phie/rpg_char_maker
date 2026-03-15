@@ -76,6 +76,7 @@ class FieldRenderer extends StatelessWidget {
             controller: controller,
             keyboardType: TextInputType.number,
             textAlign: TextAlign.center,
+            enabled: !field.readonly,
             onChanged: (value) {
               // Only update base value
               character.values[field.id] = int.tryParse(value) ?? 0;

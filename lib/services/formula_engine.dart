@@ -30,10 +30,9 @@ class FormulaEngine {
       /// assign values for aliases
       aliasMap.forEach((alias, templateField) {
 
-        final value =
-            character.values[templateField.id] ?? 0;
+        var value = character.values[templateField.id] ?? 0;
+        if (value.runtimeType == bool) { value = value ? 1 : 0;}
 
-        // Add option effects modifiers
         final modifiers = ModifierEngine.computeModifiers(template, character, aliasMap);
         final bonus = modifiers[alias] ?? 0;
         final modifiedValue = value + bonus;
@@ -95,8 +94,8 @@ class FormulaEngine {
       /// assign values for aliases
       aliasMap.forEach((alias, templateField) {
 
-        final value =
-            character.values[templateField.id] ?? 0;
+        var value = character.values[templateField.id] ?? 0;
+        if (value.runtimeType == bool) { value = value ? 1 : 0;}
 
         context.bindVariable(
           Variable(alias),
