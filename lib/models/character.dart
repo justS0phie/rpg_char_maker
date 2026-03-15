@@ -1,3 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:file_picker/file_picker.dart';
+
 import 'package:char_sheet_maker/models/item.dart';
 import 'package:char_sheet_maker/models/spell.dart';
 
@@ -74,5 +80,47 @@ class Character {
             .toList();
 
     return character;
+  }
+
+  Future<File> saveCharacter() async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/characters/$name.json');
+    final jsonData = jsonEncode(toJson());
+
+    return file.writeAsString(jsonData);
+  }
+
+  Future<Character> loadCharacter(File file) async {
+    final jsonString = await file.readAsString();
+    final jsonData = jsonDecode(jsonString);
+
+    return Character.fromJson(jsonData);
+  }
+
+  Future<void> exportCharacter(Character character) async {
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/character_export.json');
+
+    await file.writeAsString(
+        jsonEncode(character.toJson())
+    );
+
+    await Share.shareXFiles([XFile(file.path)]);
+  }
+
+  Future<Character?> importCharacter() async {
+
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+    );
+
+    if (result == null) return null;
+
+    final file = File(result.files.single.path!);
+    final jsonString = await file.readAsString();
+    final jsonData = jsonDecode(jsonString);
+
+    return Character.fromJson(jsonData);
   }
 }
