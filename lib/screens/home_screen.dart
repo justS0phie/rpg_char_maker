@@ -81,14 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
             title: Text(character.name),
             subtitle: Text(template.name),
 
-            onTap: () {
+            onTap: () async {
+              final fullTemplate = await TemplateService().loadTemplate(template.id);
 
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (_) => CharacterEditorScreen(
                     character: character,
-                    template: template,
+                    template: fullTemplate,
                   ),
                 ),
               );
@@ -119,11 +120,10 @@ class _HomeScreenState extends State<HomeScreen> {
               title: Text(template.name),
               subtitle: Text(template.system),
 
-              onTap: () {
-
+              onTap: () async {
+                final fullTemplate = await TemplateService().loadTemplate(template.id);
                 Navigator.pop(context);
-                createCharacter(template);
-
+                createCharacter(fullTemplate);
               },
             );
 

@@ -1,5 +1,3 @@
-import 'package:char_sheet_maker/models/sheet_element.dart';
-import 'package:char_sheet_maker/models/spell.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/option.dart';
 import '../models/template.dart';
@@ -109,147 +107,51 @@ class TemplateService {
           spells: []
       );
 
-      final pages = await _fetchPages(template);
-      final slots = await _fetchSlots(template);
-      final spells = await _fetchSpells(template);
-      template.pages = pages;
-      template.slots = slots;
-      template.spells = spells;
-      await _loadOptionGroups(template, null);
+      // final pages = await _fetchPages(template);
+      // final slots = await _fetchSlots(template);
+      // final spells = await _fetchSpells(template);
+      // template.pages = pages;
+      // template.slots = slots;
+      // template.spells = spells;
+      // await _loadOptionGroups(template, null);
       templates.add(template);
     }
 
     return templates;
   }
 
-  Future<List<Spell>> _fetchSpells(Template template) async {
-    final rows = await supabase
-        .from('spells')
-        .select()
-        .eq('template_id', template.id);
+  Future<Template> loadTemplate(String templateId) async {
 
-    List<Spell> spells = [];
-
-    for (final row in rows) {
-      final spellRequirements = await supabase
-          .from('spell_requirements')
-          .select()
-          .eq('spell_id', row['id']);
-
-      spells.add(
-        Spell(
-            id: row['id'],
-            name: row['name'],
-            description: row['description'],
-            level: row['level'],
-            requiredOptions: spellRequirements.map((r) => r['option_id'] as String).toList()
+    final response = await supabase
+        .from('templates')
+        .select('''
+        *,
+        spells (
+          *,
+          spell_requirements (*)
         ),
-      );
-    }
+        template_spell_slots (*),
+        template_pages (
+          *,
+          template_sections (
+            *,
+            template_fields (*),
+            option_groups (
+              *,
+              options (
+                *,
+                option_effects (*),
+                option_abilities (*)
+              )
+            )
+          )
+        )
+      ''')
+        .eq('id', templateId)
+        .single();
 
-    return spells;
-  }
-
-  Future<List<TemplateSpellSlot>> _fetchSlots(Template template) async {
-    final slots = await supabase
-        .from('template_spell_slots')
-        .select()
-        .eq('template_id', template.id)
-        .order('level', ascending: true);
-
-    return slots.map((s) {
-      return TemplateSpellSlot(
-        id: s['id'],
-        level: s['level'],
-        maxFormula: s['max_formula'],
-        requiredFormula: s['required_formula'],
-        srcLabel: s['src_label'],
-      );
-    }).toList();
-  }
-
-  Future<List<TemplatePage>> _fetchPages(Template template) async {
-    final sectionRows = await supabase
-        .from('template_pages')
-        .select()
-        .eq('template_id', template.id)
-        .order('order_index', ascending: true);
-
-    List<TemplatePage> pages = [];
-
-    for (final sectionRow in sectionRows) {
-      final sections = await _fetchSections(template, sectionRow['id']);
-
-      pages.add(
-        TemplatePage(
-          id: sectionRow['id'],
-          name: sectionRow['name'],
-          sections: sections,
-          parent: template
-        ),
-      );
-    }
-
-    return pages;
-  }
-
-  Future<List<TemplateSection>> _fetchSections(Template template, String pageId) async {
-    final sectionRows = await supabase
-        .from('template_sections')
-        .select()
-        .eq('template_id', template.id)
-        .eq('page_id', pageId)
-        .order('display_order', ascending: true);
-
-    List<TemplateSection> sections = [];
-
-    for (final sectionRow in sectionRows) {
-      final sectionId = sectionRow['id'];
-
-      final fields = await _fetchFields(template, sectionId);
-      final optionGroups = await _loadOptionGroups(template, sectionId);
-
-      List<SheetElement> elements = [];
-
-      elements.addAll(fields.map((field) {return FieldElement(elem: field);}));
-      elements.addAll(optionGroups.map((og) {return OptionGroupElement(elem: og);}));
-
-      sections.add(
-        TemplateSection(
-          id: sectionId,
-          name: sectionRow['name'],
-          order: sectionRow['display_order'],
-          type: sectionRow['type'],
-          elements: elements,
-        ),
-      );
-    }
-
-    return sections;
-  }
-
-  Future<List<TemplateField>> _fetchFields(Template template, String sectionId) async {
-    final fieldRows = await supabase
-        .from('template_fields')
-        .select()
-        .eq('section_id', sectionId)
-        .order('display_order');
-
-    List<TemplateField> result = fieldRows.map<TemplateField>((row) {
-      return TemplateField(
-        id: row['id'],
-        label: row['label'],
-        type: row['field_type'],
-        defaultValue: row['default_value'] ?? '',
-        row: row['grid_row'] ?? 0,
-        column: row['grid_column'] ?? 0,
-        alias: row['alias'],
-        formula: row['formula'],
-        readonly: row['readonly'] ?? false,
-      );
-    }).toList();
-
-    template.fields.addAll(result);
+    Template result = Template.fromJson(response);
+    await _loadOptionGroups(result, null);
     return result;
   }
 }

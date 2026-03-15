@@ -9,8 +9,8 @@ class Template {
   List<TemplatePage> pages;
   List<TemplateSpellSlot> slots;
   List<Spell> spells;
-  final Set<OptionGroup> optionGroups;
-  final Set<TemplateField> fields;
+  Set<OptionGroup> optionGroups;
+  Set<TemplateField> fields;
 
   Template({
     required this.id,
@@ -22,6 +22,89 @@ class Template {
     required this.optionGroups,
     required this.fields,
   });
+
+  factory Template.fromJson(Map<String,dynamic> json) {
+
+    Template result = Template(
+
+      id: json['id'],
+      name: json['name'],
+      system: json['system'],
+      fields: {},
+
+      optionGroups: {},
+
+      slots: (json['template_spell_slots'] ?? [])
+        .map<TemplateSpellSlot>((s) => TemplateSpellSlot(
+          id: s['id'],
+          level: s['level'],
+          maxFormula: s['max_formula'],
+          requiredFormula: s['required_formula'],
+          srcLabel: s['src_label'],
+        ))
+        .toList(),
+
+      spells: (json['spells'] ?? [])
+          .map<Spell>((s) => Spell(
+              id: s['id'],
+              name: s['name'],
+              description: s['description'],
+              level: s['level'],
+              requiredOptions: List.from((s['spell_requirements'] ?? []).map((sr) => sr["option_id"]))
+          ))
+          .toList(),
+
+      pages: [],
+
+    );
+
+    result.pages = (json['template_pages'] ?? [])
+      .map<TemplatePage>((p) => TemplatePage(
+      id: p['id'],
+      name: p['name'],
+      sections: List.from(p["template_sections"].map((s) => TemplateSection(
+        id: s["id"],
+        name: s['name'],
+        order: s['display_order'],
+        type: s['type'],
+        elements: List<SheetElement>.from(s["template_fields"].map((f) => FieldElement(elem: TemplateField(
+          id: f['id'],
+          label: f['label'],
+          type: f['field_type'],
+          defaultValue: f['default_value'] ?? '',
+          row: f['grid_row'] ?? 0,
+          column: f['grid_column'] ?? 0,
+          alias: f['alias'],
+          formula: f['formula'],
+          readonly: f['readonly'] ?? false,
+        ))).toList() + s["option_groups"].map((o) => OptionGroupElement(elem: OptionGroup(
+          id: o['id'],
+          name: o['name'],
+          alias: o['alias'],
+          required: o['required'] ?? false,
+          multiSelect: o['multi_select'] ?? false,
+          options: List.from((o["options"] ?? []).map((opt) {
+            final List<OptionEffect> effects = List.from(opt["option_effects"].map((oe) => OptionEffect.fromJson(oe)));
+            final List<OptionAbility> abilities = List.from(opt["option_abilities"].map((oa) => OptionAbility.fromJson(oa)));
+            return Option.fromJson(opt, effects, abilities);
+          })),
+          row: o['grid_row'] ?? 0,
+          column: o['grid_column'] ?? 0,
+        ))).toList()),
+      ))),
+      parent: result
+    )).toList();
+
+    for (var page in result.pages) {
+      result.fields.addAll(page.sections.expand((s) => s.elements.where((el) => el.type == "field").map((el) => (el as FieldElement).elem)));
+    }
+
+    for (var page in result.pages) {
+      result.optionGroups.addAll(page.sections.expand((s) => s.elements.where((el) => el.type == "option_group").map((el) => (el as OptionGroupElement).elem)));
+    }
+
+    return result;
+  }
 }
 
 class TemplatePage {
