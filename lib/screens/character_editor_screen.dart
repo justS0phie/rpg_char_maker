@@ -1,4 +1,5 @@
 import 'package:char_sheet_maker/models/sheet_element.dart';
+import 'package:char_sheet_maker/services/template_service.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -77,7 +78,50 @@ class _CharacterEditorScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Character Editor"),
+        title: Text("Character Editor - ${template.name}"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.save),
+            tooltip: "Save",
+            onPressed: () async {
+              await character.saveCharacter();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text("Character saved")),
+              );
+            },
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.share),
+            tooltip: "Export",
+            onPressed: () async {
+              await character.exportCharacter();
+            },
+          ),
+
+          IconButton(
+            icon: const Icon(Icons.download),
+            tooltip: "Import",
+            onPressed: () async {
+
+              final imported = await Character.importCharacter();
+
+              if (imported != null) {
+                final Template template = await TemplateService().getById(imported.templateId);
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CharacterEditorScreen(
+                      character: imported,
+                      template: template,
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
       ),
 
       body: Column(

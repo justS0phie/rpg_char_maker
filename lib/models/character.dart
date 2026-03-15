@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 
 import 'package:char_sheet_maker/models/item.dart';
 import 'package:char_sheet_maker/models/spell.dart';
+import 'package:uuid/v4.dart';
 
 import 'equipment_item.dart';
 
@@ -60,7 +61,7 @@ class Character {
   factory Character.fromJson(Map<String,dynamic> json) {
 
     final character = Character(
-      id: json["id"],
+      id: UuidV4().generate(),
       name: json["name"],
       templateId: json["templateId"],
       spells: json["spells"]
@@ -84,7 +85,7 @@ class Character {
 
   Future<File> saveCharacter() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/characters/$name.json');
+    final file = File('${dir.path}/characters/$id.json');
     final jsonData = jsonEncode(toJson());
 
     return file.writeAsString(jsonData);
@@ -97,19 +98,15 @@ class Character {
     return Character.fromJson(jsonData);
   }
 
-  Future<void> exportCharacter(Character character) async {
+  Future<void> exportCharacter() async {
     final dir = await getTemporaryDirectory();
     final file = File('${dir.path}/character_export.json');
 
-    await file.writeAsString(
-        jsonEncode(character.toJson())
-    );
-
+    await file.writeAsString(jsonEncode(toJson()));
     await Share.shareXFiles([XFile(file.path)]);
   }
 
-  Future<Character?> importCharacter() async {
-
+  static Future<Character?> importCharacter() async {
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['json'],
@@ -121,6 +118,8 @@ class Character {
     final jsonString = await file.readAsString();
     final jsonData = jsonDecode(jsonString);
 
-    return Character.fromJson(jsonData);
+    Character char = Character.fromJson(jsonData);
+    await char.saveCharacter();
+    return char;
   }
 }

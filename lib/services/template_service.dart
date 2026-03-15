@@ -86,6 +86,26 @@ Future<List<Option>> _loadOptions(String groupId) async {
 class TemplateService {
   final supabase = Supabase.instance.client;
 
+  Future<Template> getById(String templateId) async {
+    final templateRows = await supabase
+        .from('templates')
+        .select()
+        .eq("id", templateId)
+        .limit(1);
+
+    var templateRow = templateRows[0];
+    return Template(
+        id: templateId,
+        name: templateRow['name'],
+        system: templateRow['system'],
+        pages: [],
+        optionGroups: {},
+        fields: {},
+        slots: [],
+        spells: []
+    );
+  }
+
   Future<List<Template>> fetchTemplates() async {
     final templateRows = await supabase
         .from('templates')
@@ -107,13 +127,6 @@ class TemplateService {
           spells: []
       );
 
-      // final pages = await _fetchPages(template);
-      // final slots = await _fetchSlots(template);
-      // final spells = await _fetchSpells(template);
-      // template.pages = pages;
-      // template.slots = slots;
-      // template.spells = spells;
-      // await _loadOptionGroups(template, null);
       templates.add(template);
     }
 

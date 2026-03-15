@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/v4.dart';
 
 import '../models/character.dart';
 import '../models/template.dart';
@@ -38,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void createCharacter(Template template) {
 
     final character = Character(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: UuidV4().generate(),
       name: "New Character",
       templateId: template.id,
     );
