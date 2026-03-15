@@ -67,7 +67,7 @@ class _EquipmentEditorDialogState extends State<EquipmentEditorDialog> {
                     child: DropdownButton<String>(
                       value: fieldId,
                       isExpanded: true,
-                      items: fields.where((f) {return f.alias != null;}).map((f) {
+                      items: fields.where((f) {return f.alias != null && f.label != "";}).map((f) {
                         return DropdownMenuItem(
                           value: f.alias,
                           child: Text(f.label),
