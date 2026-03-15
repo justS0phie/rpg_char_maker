@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/v4.dart';
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    loadSavedCharacters();
     loadTemplates();
   }
 
@@ -90,7 +92,9 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(title: const Text("Characters")),
 
       body: ListView(
-        children: characters.map((character) {
+        children: characters.sorted((a, b) => a.name.compareTo(b.name)).map((
+          character,
+        ) {
           final template = templates.firstWhere(
             (t) => t.id == character.templateId,
           );
