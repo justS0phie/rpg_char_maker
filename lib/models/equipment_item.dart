@@ -27,7 +27,7 @@ class EquipmentItem {
       id: json["id"],
       name: json["name"],
       equipped: json["equipped"],
-      modifiers: json["modifiers"],
+      modifiers: Map<String, int>.from(json["modifiers"])
     );
   }
 }

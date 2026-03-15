@@ -107,7 +107,7 @@ class _CharacterEditorScreenState
               final imported = await Character.importCharacter();
 
               if (imported != null) {
-                final Template template = await TemplateService().getById(imported.templateId);
+                final Template template = await TemplateService().loadTemplate(imported.templateId);
                 Navigator.pop(context);
                 Navigator.push(
                   context,

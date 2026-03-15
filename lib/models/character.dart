@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:file_picker/file_picker.dart';
@@ -70,7 +71,7 @@ class Character {
       id: json["id"] ?? UuidV4().generate(),
       name: json["name"],
       templateId: json["templateId"],
-      spells: json["spells"]
+      spells: Set<String>.from(json["spells"])
     );
 
     character.values = Map<String,dynamic>.from(json["values"] ?? {});
@@ -95,12 +96,18 @@ class Character {
     return character;
   }
 
-  Future<File> saveCharacter() async {
+  Future<void> saveCharacter() async {
     final jsonData = jsonEncode(toJson());
-    final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/$id.json');
+    debugPrint(jsonData);
+    try {
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/$id.json');
 
-    return file.writeAsString(jsonData);
+      file.writeAsString(jsonData);
+    } catch (e) {
+      print("Failed to save character: ${name}");
+      print(e);
+    }
   }
 
   Future<Character> loadCharacter(File file) async {
@@ -128,8 +135,7 @@ class Character {
 
     if (result == null) return null;
 
-    final file = File(result.files.single.path!);
-    final jsonString = await file.readAsString();
+    final jsonString = utf8.decode(result.files.single.bytes!);
     final jsonData = jsonDecode(jsonString);
 
     Character char = Character.fromJson(jsonData);
