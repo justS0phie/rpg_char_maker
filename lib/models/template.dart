@@ -1,5 +1,6 @@
 import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'package:char_sheet_maker/models/spell.dart';
+import 'package:collection/collection.dart';
 import 'option.dart';
 
 class Template {
@@ -84,11 +85,11 @@ class Template {
           alias: o['alias'],
           required: o['required'] ?? false,
           multiSelect: o['multi_select'] ?? false,
-          options: List.from((o["options"] ?? []).map((opt) {
+          options: List<Option>.from((o["options"] ?? []).map((opt) {
             final List<OptionEffect> effects = List.from(opt["option_effects"].map((oe) => OptionEffect.fromJson(oe)));
             final List<OptionAbility> abilities = List.from(opt["option_abilities"].map((oa) => OptionAbility.fromJson(oa)));
             return Option.fromJson(opt, effects, abilities);
-          })),
+          })).sorted((a, b) => a.name.compareTo(b.name)),
           row: o['grid_row'] ?? 0,
           column: o['grid_column'] ?? 0,
         ))).toList()),
