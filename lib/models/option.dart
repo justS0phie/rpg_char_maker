@@ -46,7 +46,7 @@ class OptionAbility {
   final String optionId;
   final String description;
   final int levelRequired;
-  final Map<String, dynamic> modifiers;
+  final Map<int, dynamic> modifiers;
   final String? optionGroupId;
 
   OptionAbility({

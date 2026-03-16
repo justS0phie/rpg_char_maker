@@ -18,6 +18,25 @@ class AbilitiesSection extends StatelessWidget {
     required this.onChanged,
   });
 
+  String getAbilityDescription(OptionAbility ability, Character character) {
+    Map<String, String> translations = {};
+    String finalMsg = ability.description;
+
+    for (int level in ability.modifiers.keys) {
+      if (character.values["LVL"] ?? 0 < level) {
+        continue;
+      }
+      for (String transKey in ability.modifiers[level]) {
+        translations[transKey] = ability.modifiers[level][transKey];
+      }
+    }
+
+    for (String translation in translations.keys) {
+      finalMsg = finalMsg.replaceAll("{$translation}", translations[translation]!);
+    }
+    return finalMsg;
+  }
+
   @override
   Widget build(BuildContext context) {
     List<OptionAbility> abilities = [];
@@ -56,7 +75,7 @@ class AbilitiesSection extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
 
-                MarkdownBody(data: ability.description),
+                MarkdownBody(data: getAbilityDescription(ability, character)),
 
                 if (ability.optionGroupId != null)
                   OptionGroupWidget(
