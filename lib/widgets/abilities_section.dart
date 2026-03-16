@@ -4,6 +4,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import '../models/option.dart';
 import '../models/template.dart';
 import '../models/character.dart';
+import '../services/spell_formula_engine.dart';
 import 'option_group_widget.dart';
 
 class AbilitiesSection extends StatelessWidget {
@@ -36,7 +37,10 @@ class AbilitiesSection extends StatelessWidget {
     }
 
     for (String translation in translations.keys) {
-      finalMsg = finalMsg.replaceAll("{$translation}", translations[translation]!);
+      finalMsg = finalMsg.replaceAll(
+        "{$translation}",
+        translations[translation]!,
+      );
     }
     return finalMsg;
   }
@@ -44,7 +48,9 @@ class AbilitiesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<OptionAbility> abilities = [];
-    final lvlField = template.fields.where((f) {return f.alias == "LVL";}).firstOrNull;
+    final lvlField = template.fields.where((f) {
+      return f.alias == "LVL";
+    }).firstOrNull;
     final level = lvlField != null ? character.values[lvlField.id] ?? 0 : 0;
 
     for (OptionGroup group in template.optionGroups) {
@@ -52,8 +58,12 @@ class AbilitiesSection extends StatelessWidget {
       if (groupSelections.isEmpty) continue;
 
       for (Option option in group.options) {
-        if (groupSelections.contains(option.id)){
-          abilities.addAll(option.abilities.where((ability) {return level >= ability.levelRequired;}));
+        if (groupSelections.contains(option.id)) {
+          abilities.addAll(
+            option.abilities.where((ability) {
+              return level >= ability.levelRequired;
+            }),
+          );
         }
       }
     }
@@ -79,17 +89,26 @@ class AbilitiesSection extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
 
-                MarkdownBody(data: getAbilityDescription(ability)),
+                MarkdownBody(
+                  data: parseDescription(
+                    getAbilityDescription(ability),
+                    character,
+                    template,
+                    aliasMap,
+                  ),
+                ),
                 const SizedBox(height: 10),
 
                 if (ability.optionGroupId != null)
                   OptionGroupWidget(
-                    group: template.optionGroups.firstWhere((og) {return og.id == ability.optionGroupId;}),
+                    group: template.optionGroups.firstWhere((og) {
+                      return og.id == ability.optionGroupId;
+                    }),
                     character: character,
                     onChanged: onChanged,
-                  )
+                  ),
               ],
-            )
+            ),
           );
         }),
 
