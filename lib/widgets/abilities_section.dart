@@ -24,8 +24,8 @@ class AbilitiesSection extends StatelessWidget {
     Map<String, String> translations = {};
     String finalMsg = ability.description;
 
-    for (int level in ability.modifiers.keys) {
-      if (character.values["LVL"] ?? 0 < level) {
+    for (String level in ability.modifiers.keys) {
+      if (character.values["LVL"] ?? 0 < int.tryParse(level)!) {
         continue;
       }
       for (String transKey in ability.modifiers[level]) {

@@ -46,7 +46,7 @@ class OptionAbility {
   final String optionId;
   final String description;
   final int levelRequired;
-  final Map<int, dynamic> modifiers;
+  final Map<String, dynamic> modifiers;
   final String? optionGroupId;
 
   OptionAbility({
@@ -66,7 +66,7 @@ class OptionAbility {
       name: json['name'],
       description: json['description'] ?? '',
       levelRequired: json['level_required'],
-      modifiers: Map<int, dynamic>.from(json['modifiers']),
+      modifiers: Map<String, dynamic>.from(json['modifiers']),
       optionGroupId: json['option_group_id'],
     );
   }
