@@ -66,7 +66,7 @@ class OptionAbility {
       name: json['name'],
       description: json['description'] ?? '',
       levelRequired: json['level_required'],
-      modifiers: json['modifiers'],
+      modifiers: Map<int, dynamic>.from(json['modifiers']),
       optionGroupId: json['option_group_id'],
     );
   }

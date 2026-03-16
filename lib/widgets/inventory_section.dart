@@ -1,3 +1,4 @@
+import 'package:char_sheet_maker/models/template.dart';
 import 'package:flutter/material.dart';
 
 import '../models/character.dart';
@@ -6,11 +7,13 @@ import '../models/item.dart';
 class InventorySection extends StatelessWidget {
   final Character character;
   final VoidCallback onChanged;
+  final TemplateSection section;
 
   const InventorySection({
     super.key,
     required this.character,
     required this.onChanged,
+    required this.section,
   });
 
   @override
@@ -18,8 +21,8 @@ class InventorySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Inventory",
+        Text(
+          section.name,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 

@@ -12,6 +12,7 @@ class SpellSection extends StatefulWidget {
   final Character character;
   final VoidCallback onChanged;
   final bool usePreparing;
+  final TemplateSection section;
   final Map<String, TemplateField> aliasMap;
 
   const SpellSection({
@@ -20,6 +21,7 @@ class SpellSection extends StatefulWidget {
     required this.character,
     required this.onChanged,
     required this.usePreparing,
+    required this.section,
     required this.aliasMap,
   });
 

@@ -35,22 +35,26 @@ class SectionRenderer extends StatelessWidget {
     if (section.type == "equip") {
       return EquipmentSection(
         character: character,
+        section: section,
         onChanged: onValueChanged,
         template: template,
       );
     } else if (section.type == "abilities") {
       return AbilitiesSection(
         template: template,
+        section: section,
         character: character,
         onChanged: onValueChanged,
       );
     } else if (section.type == "inventory") {
       return InventorySection(
         character: character,
+        section: section,
         onChanged: onValueChanged,
       );
     } else if (section.type == "spells" || section.type == "spells_simple") {
       return SpellSection(
+        section: section,
         character: character,
         template: template,
         aliasMap: aliasMap,

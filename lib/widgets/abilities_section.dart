@@ -10,12 +10,14 @@ class AbilitiesSection extends StatelessWidget {
   final Template template;
   final Character character;
   final VoidCallback onChanged;
+  final TemplateSection section;
 
   const AbilitiesSection({
     super.key,
     required this.template,
     required this.character,
     required this.onChanged,
+    required this.section,
   });
 
   String getAbilityDescription(OptionAbility ability, Character character) {
@@ -57,8 +59,8 @@ class AbilitiesSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Abilities",
+        Text(
+          section.name,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
@@ -76,6 +78,7 @@ class AbilitiesSection extends StatelessWidget {
                 ),
 
                 MarkdownBody(data: getAbilityDescription(ability, character)),
+                const SizedBox(height: 10),
 
                 if (ability.optionGroupId != null)
                   OptionGroupWidget(

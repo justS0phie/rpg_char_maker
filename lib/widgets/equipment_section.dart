@@ -8,12 +8,14 @@ class EquipmentSection extends StatelessWidget {
   final Character character;
   final Template template;
   final VoidCallback onChanged;
+  final TemplateSection section;
 
   const EquipmentSection({
     super.key,
     required this.character,
     required this.template,
     required this.onChanged,
+    required this.section,
   });
 
   @override
@@ -21,8 +23,8 @@ class EquipmentSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Equipment",
+        Text(
+          section.name,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
