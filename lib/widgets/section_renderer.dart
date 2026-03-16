@@ -44,6 +44,7 @@ class SectionRenderer extends StatelessWidget {
         template: template,
         section: section,
         character: character,
+        aliasMap: aliasMap,
         onChanged: onValueChanged,
       );
     } else if (section.type == "inventory") {

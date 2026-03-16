@@ -10,6 +10,7 @@ class AbilitiesSection extends StatelessWidget {
   final Template template;
   final Character character;
   final VoidCallback onChanged;
+  final Map<String, TemplateField> aliasMap;
   final TemplateSection section;
 
   const AbilitiesSection({
@@ -17,18 +18,19 @@ class AbilitiesSection extends StatelessWidget {
     required this.template,
     required this.character,
     required this.onChanged,
+    required this.aliasMap,
     required this.section,
   });
 
-  String getAbilityDescription(OptionAbility ability, Character character) {
+  String getAbilityDescription(OptionAbility ability) {
     Map<String, String> translations = {};
     String finalMsg = ability.description;
 
     for (String level in ability.modifiers.keys) {
-      if (character.values["LVL"] ?? 0 < int.tryParse(level)!) {
+      if ((character.values[aliasMap["LVL"]?.id] ?? 0) < int.tryParse(level)!) {
         continue;
       }
-      for (String transKey in ability.modifiers[level]) {
+      for (String transKey in ability.modifiers[level].keys) {
         translations[transKey] = ability.modifiers[level][transKey];
       }
     }
@@ -77,7 +79,7 @@ class AbilitiesSection extends StatelessWidget {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
 
-                MarkdownBody(data: getAbilityDescription(ability, character)),
+                MarkdownBody(data: getAbilityDescription(ability)),
                 const SizedBox(height: 10),
 
                 if (ability.optionGroupId != null)
