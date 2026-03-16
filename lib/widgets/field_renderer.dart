@@ -79,7 +79,7 @@ class FieldRenderer extends StatelessWidget {
             enabled: !field.readonly,
             onChanged: (value) {
               // Only update base value
-              character.values[field.id] = int.tryParse(value) ?? 0;
+              character.values[field.id] = double.tryParse(value) ?? 0;
               onValueChanged();
             },
           ),
@@ -110,7 +110,7 @@ class FieldRenderer extends StatelessWidget {
           width: 60,
           child: TextField(
             controller: TextEditingController(
-              text: displayValue.toStringAsFixed(0),
+              text: displayValue.toString(),
             ),
             enabled: !field.readonly,
             textAlign: TextAlign.center,
