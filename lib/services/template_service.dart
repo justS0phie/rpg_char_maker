@@ -10,13 +10,27 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId
   if (sectionId != null) {
     groupResponse = await supabase
         .from('option_groups')
-        .select()
+        .select('''
+        *,
+        options(
+          *,
+          option_effects (*),
+          option_abilities (*)
+        )
+        ''')
         .eq('section_id', sectionId)
         .order('display_order');
   } else {
     groupResponse = await supabase
         .from('option_groups')
-        .select()
+        .select('''
+        *,
+        options(
+          *,
+          option_effects (*),
+          option_abilities (*)
+        )
+        ''')
         .isFilter('section_id', null)
         .order('display_order');
   }
@@ -24,7 +38,14 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId
   List<OptionGroup> groups = [];
 
   for (final group in groupResponse) {
-    final options = await _loadOptions(group["id"]);
+    List<Option> options = [];
+
+    for (final option in group['options']) {
+      final optionObj = Option.fromJson(option, [], []);
+      options.add(
+        optionObj,
+      );
+    }
 
     groups.add(
       OptionGroup(
@@ -42,54 +63,6 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId
 
   template.optionGroups.addAll(groups);
   return groups;
-}
-
-Future<List<Option>> _loadOptions(String groupId) async {
-  final supabase = Supabase.instance.client;
-
-  final optionsResponse = await supabase
-      .from('options')
-      .select()
-      .eq('group_id', groupId);
-
-  List<Option> options = [];
-
-  for (final option in optionsResponse) {
-    final optionObj = Option.fromJson(option, [], []);
-    await _loadOptionRelations(optionObj);
-    options.add(
-      optionObj,
-    );
-  }
-
-  return options;
-}
-
-Future<void> _loadOptionRelations(Option option) async {
-  final supabase = Supabase.instance.client;
-
-  final effectsResponse = await supabase
-      .from('option_effects')
-      .select()
-      .eq('option_id', option.id);
-
-  final effects = effectsResponse
-      .map<OptionEffect>((e) =>
-      OptionEffect.fromJson(e))
-      .toList();
-
-  final abilitiesResponse = await supabase
-      .from('option_abilities')
-      .select()
-      .eq('option_id', option.id);
-
-  final abilities = abilitiesResponse
-      .map<OptionAbility>((e) =>
-      OptionAbility.fromJson(e))
-      .toList();
-
-  option.effects = effects;
-  option.abilities = abilities;
 }
 
 class TemplateService {
