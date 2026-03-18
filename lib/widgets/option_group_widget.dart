@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import '../models/character.dart';
@@ -36,7 +37,7 @@ class OptionGroupWidget extends StatelessWidget {
             value: selected,
             hint: Text("Select ${group.name}"),
 
-            items: group.options.map((option) {
+            items: group.options.sorted((a,b) => a.name.compareTo(b.name)).map((option) {
               return DropdownMenuItem(
                 value: option.id,
                 child: Text(option.name),
@@ -62,7 +63,7 @@ class OptionGroupWidget extends StatelessWidget {
       children: [
         Text(group.name),
 
-        ...group.options.map((option) {
+        ...group.options.sorted((a,b) => a.name.compareTo(b.name)).map((option) {
           final isSelected = selection.contains(option.id);
 
           return CheckboxListTile(

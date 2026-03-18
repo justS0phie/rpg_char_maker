@@ -79,7 +79,11 @@ class AbilitiesSection extends StatelessWidget {
 
         const SizedBox(height: 10),
 
-        ...abilities.sorted((a, b) => a.levelRequired.compareTo(b.levelRequired)).map((ability) {
+        ...abilities.sorted((a, b) {
+            final levelCompare = a.levelRequired.compareTo(b.levelRequired);
+            if (levelCompare != 0) {return levelCompare;}
+            return a.name.compareTo(b.name);
+          }).map((ability) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Column(
