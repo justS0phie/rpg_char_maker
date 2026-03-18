@@ -5,16 +5,16 @@ String preprocess(String expression) {
     (m) => 'min(max(${m[1]},${m[2]}),${m[3]})',
   );
 
-  /// min(a,b)
-  expression = expression.replaceAllMapped(
-    RegExp(r'min\(([^,]+),([^)]+)\)'),
-    (m) => '((${m[1]}) + (${m[2]}) - abs((${m[1]}) - (${m[2]}))) / 2',
-  );
-
   /// max(a,b)
   expression = expression.replaceAllMapped(
     RegExp(r'max\(([^,]+),([^)]+)\)'),
     (m) => '((${m[1]}) + (${m[2]}) + abs((${m[1]}) - (${m[2]}))) / 2',
+  );
+
+  /// min(a,b)
+  expression = expression.replaceAllMapped(
+    RegExp(r'min\(([^,]+),([^)]+)\)'),
+        (m) => '((${m[1]}) + (${m[2]}) - abs((${m[1]}) - (${m[2]}))) / 2',
   );
 
   /// step(x,t) → floor(x/t)

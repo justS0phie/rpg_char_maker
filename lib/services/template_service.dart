@@ -1,4 +1,5 @@
 import 'package:char_sheet_maker/models/spell.dart';
+import 'package:collection/collection.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/option.dart';
 import '../models/template.dart';
@@ -44,7 +45,7 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId
       final optionObj = Option.fromJson(
         option,
         List.from(option["option_effects"].map((oe) => OptionEffect.fromJson(oe))),
-        List.from(option["option_abilities"].map((oa) => OptionAbility.fromJson(oa)))
+        List<OptionAbility>.from(option["option_abilities"].map((oa) => OptionAbility.fromJson(oa))).sorted((a, b) => a.levelRequired.compareTo(b.levelRequired))
       );
       options.add(optionObj);
     }
