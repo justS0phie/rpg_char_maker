@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
@@ -78,7 +79,7 @@ class AbilitiesSection extends StatelessWidget {
 
         const SizedBox(height: 10),
 
-        ...abilities.map((ability) {
+        ...abilities.sorted((a, b) => a.levelRequired.compareTo(b.levelRequired)).map((ability) {
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: Column(
