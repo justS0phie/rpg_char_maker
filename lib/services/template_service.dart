@@ -22,17 +22,17 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId
         .order('display_order');
   } else {
     groupResponse = await supabase
-        .from('option_groups')
-        .select('''
+      .from('option_groups')
+      .select('''
+      *,
+      options(
         *,
-        options(
-          *,
-          option_effects (*),
-          option_abilities (*)
-        )
-        ''')
-        .isFilter('section_id', null)
-        .order('display_order');
+        option_effects (*),
+        option_abilities (*)
+      )
+      ''')
+      .isFilter('section_id', null)
+      .order('display_order');
   }
 
   List<OptionGroup> groups = [];
@@ -41,10 +41,12 @@ Future<List<OptionGroup>> _loadOptionGroups(Template template, String? sectionId
     List<Option> options = [];
 
     for (final option in group['options']) {
-      final optionObj = Option.fromJson(option, [], []);
-      options.add(
-        optionObj,
+      final optionObj = Option.fromJson(
+        option,
+        List.from(option["option_effects"].map((oe) => OptionEffect.fromJson(oe))),
+        List.from(option["option_abilities"].map((oa) => OptionAbility.fromJson(oa)))
       );
+      options.add(optionObj);
     }
 
     groups.add(
@@ -123,6 +125,18 @@ class TemplateService {
 
     Template result = Template.fromJson(response);
     await _loadOptionGroups(result, null);
+
+    for (var group in result.optionGroups) {
+      for (var option in group.options) {
+        for (var ability in option.abilities) {
+          if (ability.optionGroupId != null) {
+            OptionGroup childGroup = result.optionGroups.firstWhere((optg) => optg.id == ability.optionGroupId);
+            childGroup.parentOption = option;
+          }
+        }
+      }
+    }
+
     return result;
   }
 

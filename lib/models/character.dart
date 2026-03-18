@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:char_sheet_maker/models/template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -141,5 +142,26 @@ class Character {
     Character char = Character.fromJson(jsonData);
     await char.saveCharacter();
     return char;
+  }
+
+  void cleanInvalidSelections(Template template) {
+    bool changed = true;
+
+    while (changed) {
+      changed = false;
+      for (var group in template.optionGroups) {
+        if (group.parentOption != null) {
+          final parentSelected =
+          selections.values.expand((s) => s).contains(group.parentOption!.id);
+
+          if (!parentSelected) {
+            if (selections.containsKey(group.id)) {
+              selections.remove(group.id);
+              changed = true;
+            }
+          }
+        }
+      }
+    }
   }
 }

@@ -7,6 +7,7 @@ class OptionGroup {
   final List<Option> options;
   final int row;
   final int column;
+  Option? parentOption;
 
   OptionGroup({
     required this.id,
@@ -17,6 +18,7 @@ class OptionGroup {
     required this.options,
     required this.row,
     required this.column,
+    this.parentOption,
   });
 }
 

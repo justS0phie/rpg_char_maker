@@ -73,6 +73,7 @@ class _CharacterEditorScreenState
     final template = widget.template;
 
     void refreshSheet() {
+      widget.character.cleanInvalidSelections(widget.template);
       setState(() {});
     }
 
