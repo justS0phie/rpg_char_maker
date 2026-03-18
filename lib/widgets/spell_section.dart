@@ -6,6 +6,7 @@ import '../models/template.dart';
 import '../models/character.dart';
 import '../models/spell.dart';
 import '../services/spell_formula_engine.dart';
+import '../services/template_service.dart';
 
 class SpellSection extends StatefulWidget {
   final Template template;
@@ -32,6 +33,7 @@ class SpellSection extends StatefulWidget {
 class _SpellSectionState extends State<SpellSection> {
   String? selectedSpellId;
   Map<String, bool> expandedSpells = {};
+  bool spellsLoaded = false;
 
   List<TemplateSpellSlot> _getAvailableSlots() {
     return getAvailableSlotsForChar(
@@ -81,8 +83,35 @@ class _SpellSectionState extends State<SpellSection> {
     setState(() {});
   }
 
+  Future<void> ensureOptionsLoaded() async {
+
+    if (widget.template.spells.isNotEmpty) {
+      if (!spellsLoaded) {
+        setState(() {
+          spellsLoaded = true;
+        });
+      }
+      return;
+    }
+
+    final spells =
+    await TemplateService()
+        .loadSpells(widget.template.id);
+
+    setState(() {
+      spellsLoaded = true;
+      widget.template.spells = spells;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    ensureOptionsLoaded();
+
+    if (!spellsLoaded) {
+      return Center(child: CircularProgressIndicator());
+    }
+
     final availableSpells = _getAvailableSpells();
     final List<Spell> sortedSpells =
         widget.character.spells.map((cs) => _getSpellById(cs)).toList()

@@ -78,8 +78,8 @@ class Option {
   final String? alias;
   final String description;
 
-  final List<OptionEffect> effects;
-  final List<OptionAbility> abilities;
+  List<OptionEffect> effects;
+  List<OptionAbility> abilities;
 
   Option({
     required this.id,

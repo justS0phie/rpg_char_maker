@@ -1,3 +1,4 @@
+import 'package:char_sheet_maker/models/spell.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/option.dart';
 import '../models/template.dart';
@@ -54,33 +55,41 @@ Future<List<Option>> _loadOptions(String groupId) async {
   List<Option> options = [];
 
   for (final option in optionsResponse) {
-
-    final effectsResponse = await supabase
-        .from('option_effects')
-        .select()
-        .eq('option_id', option['id']);
-
-    final effects = effectsResponse
-        .map<OptionEffect>((e) =>
-        OptionEffect.fromJson(e))
-        .toList();
-
-    final abilitiesResponse = await supabase
-        .from('option_abilities')
-        .select()
-        .eq('option_id', option['id']);
-
-    final abilities = abilitiesResponse
-        .map<OptionAbility>((e) =>
-        OptionAbility.fromJson(e))
-        .toList();
-
+    final optionObj = Option.fromJson(option, [], []);
+    await _loadOptionRelations(optionObj);
     options.add(
-      Option.fromJson(option, effects, abilities),
+      optionObj,
     );
   }
 
   return options;
+}
+
+Future<void> _loadOptionRelations(Option option) async {
+  final supabase = Supabase.instance.client;
+
+  final effectsResponse = await supabase
+      .from('option_effects')
+      .select()
+      .eq('option_id', option.id);
+
+  final effects = effectsResponse
+      .map<OptionEffect>((e) =>
+      OptionEffect.fromJson(e))
+      .toList();
+
+  final abilitiesResponse = await supabase
+      .from('option_abilities')
+      .select()
+      .eq('option_id', option.id);
+
+  final abilities = abilitiesResponse
+      .map<OptionAbility>((e) =>
+      OptionAbility.fromJson(e))
+      .toList();
+
+  option.effects = effects;
+  option.abilities = abilities;
 }
 
 class TemplateService {
@@ -119,10 +128,6 @@ class TemplateService {
         .from('templates')
         .select('''
         *,
-        spells (
-          *,
-          spell_requirements (*)
-        ),
         template_spell_slots (*),
         template_pages (
           *,
@@ -146,5 +151,25 @@ class TemplateService {
     Template result = Template.fromJson(response);
     await _loadOptionGroups(result, null);
     return result;
+  }
+
+  Future<List<Spell>> loadSpells(String templateId) async {
+    final response = await supabase
+        .from('spells')
+        .select('''
+        *,
+        spell_requirements (*)
+      ''')
+        .eq('template_id', templateId);
+
+    return response
+        .map<Spell>((s) => Spell(
+            id: s['id'],
+            name: s['name'],
+            description: s['description'],
+            level: s['level'],
+            requiredOptions: List.from((s['spell_requirements'] ?? []).map((sr) => sr["option_id"]))
+        ))
+        .toList();
   }
 }
