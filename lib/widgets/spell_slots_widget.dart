@@ -9,6 +9,7 @@ class SpellSlotsWidget extends StatelessWidget {
   final Character character;
   final Template template;
   final VoidCallback onChanged;
+  final TemplateSection section;
   final Map<String, TemplateField> aliasMap;
 
   const SpellSlotsWidget({
@@ -17,6 +18,7 @@ class SpellSlotsWidget extends StatelessWidget {
     required this.template,
     required this.onChanged,
     required this.aliasMap,
+    required this.section,
   });
 
   @override
@@ -24,8 +26,8 @@ class SpellSlotsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          "Spell Slots",
+        Text(
+          section.name,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 

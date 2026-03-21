@@ -1,5 +1,6 @@
 import 'package:char_sheet_maker/models/sheet_element.dart';
 import 'package:char_sheet_maker/widgets/spell_section.dart';
+import 'package:char_sheet_maker/widgets/spell_slots_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../models/template.dart';
@@ -61,6 +62,14 @@ class SectionRenderer extends StatelessWidget {
         aliasMap: aliasMap,
         onChanged: onValueChanged,
         usePreparing: section.type == "spells",
+      );
+    } else if (section.type == "spells_slots") {
+      return SpellSlotsWidget(
+        character: character,
+        template: template,
+        aliasMap: aliasMap,
+        onChanged: onValueChanged,
+        section: section,
       );
     }
 

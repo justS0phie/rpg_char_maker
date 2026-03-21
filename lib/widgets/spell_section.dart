@@ -148,17 +148,8 @@ class _SpellSectionState extends State<SpellSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        SpellSlotsWidget(
-          character: widget.character,
-          template: widget.template,
-          aliasMap: widget.aliasMap,
-          onChanged: widget.onChanged,
-        ),
-
-        const SizedBox(height: 20),
-
-        const Text(
-          "Spells",
+        Text(
+          widget.section.name,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
 
