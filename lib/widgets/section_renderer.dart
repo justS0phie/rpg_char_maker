@@ -63,7 +63,7 @@ class SectionRenderer extends StatelessWidget {
         onChanged: onValueChanged,
         usePreparing: section.type == "spells",
       );
-    } else if (section.type == "spells_slots") {
+    } else if (section.type == "spell_slots") {
       return SpellSlotsWidget(
         character: character,
         template: template,
